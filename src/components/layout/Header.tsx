@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                 onNavClick(page);
                 if (isMobile) setIsMobileMenuOpen(false);
             }}
-            className={`font-semibold transition-colors rounded-md ${isMobile ? 'block w-full text-left p-3 text-lg' : 'px-4 py-3 text-xl relative nav-link-hover'} ${currentPage === page ? 'text-[#355E3B] dark:text-[#69B870]' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+            className={`font-semibold transition-colors rounded-md ${isMobile ? 'block w-full text-left p-3 text-lg' : 'px-4 py-2 text-lg relative nav-link-hover'} ${currentPage === page ? 'text-[#355E3B] dark:text-[#69B870]' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
         >
             {name}
         </button>
@@ -87,9 +87,9 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
     return (
         <div className="sticky top-0 z-40">
             {/* Top Bar */}
-            <div className="bg-[#355E3B] text-white text-xl font-semibold">
-                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-12 overflow-hidden">
-                    <img src="/images/right.png" alt="Monk pointing right" className="h-10 w-auto mr-4 flex-shrink-0" />
+            <div className="bg-[#355E3B] text-white text-lg font-semibold">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-9 overflow-hidden">
+                    <img src="/images/right.png" alt="Monk pointing right" className="h-8 w-auto mr-3 flex-shrink-0" />
                     <p key={currentMessageIndex} className="top-bar-text-animated text-center">
                         {topBarMessages[currentMessageIndex]}
                     </p>
@@ -99,11 +99,11 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
             {/* Main Navigation */}
             <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-24">
+                    <div className="flex items-center justify-between h-16">
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <button onClick={() => onNavClick('home')} className="flex items-center">
-                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-20 w-auto" />
+                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-14 w-auto" />
                             </button>
                         </div>
 
