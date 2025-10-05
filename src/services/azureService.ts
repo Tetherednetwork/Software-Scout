@@ -1,8 +1,13 @@
 import { GroundingChunk, Message, SoftwareFilter, Platform, Session, UserDevice } from '../types';
 import { supabase } from './supabase';
 
+const azureEndpoint = process.env.AZURE_ENDPOINT;
+
 if (!process.env.AZURE_API_KEY) {
-    console.warn("AZURE_API_KEY environment variable not set. Azure AI functionality will be disabled.");
+    console.warn("AZURE_API_KEY environment variable not set. Azure AI Foundry functionality will be disabled.");
+}
+if (!azureEndpoint) {
+    console.warn("AZURE_ENDPOINT environment variable not set. Azure AI Foundry functionality will be disabled.");
 }
 
 // This system instruction is adapted for a generic powerful chat model, like those powering Azure AI Foundry.
@@ -102,9 +107,9 @@ export interface BotResponse {
 
 // Note: This function assumes a Microsoft Azure-hosted model endpoint that is compatible with the OpenAI API format.
 export const findSoftware = async (history: Message[], filter: SoftwareFilter, session: Session | null): Promise<BotResponse> => {
-    if (!process.env.AZURE_API_KEY) {
+    if (!process.env.AZURE_API_KEY || !azureEndpoint) {
          return {
-            text: "The Azure AI service is not configured. The API key is missing.",
+            text: "The Azure AI service is not configured. The API key or endpoint URL is missing.",
             type: 'standard',
         };
     }
@@ -178,14 +183,14 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
             };
         }
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', { // Using a compatible endpoint
+        const response = await fetch(azureEndpoint, { // Use the configured Azure endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.AZURE_API_KEY}`
+                'api-key': `${process.env.AZURE_API_KEY}` // Azure uses 'api-key' header
             },
             body: JSON.stringify({
-                model: 'gpt-4o', // Assuming access to a powerful model
+                // The body format may differ slightly depending on the Azure API version
                 messages: [
                     { role: 'system', content: azureSystemInstruction },
                     ...messages
@@ -195,10 +200,10 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Azure AI API Error:", errorData);
-            const errorText = errorData?.error?.message || "An unknown error occurred with the Azure AI API.";
+            console.error("Azure AI Foundry API Error:", errorData);
+            const errorText = errorData?.error?.message || "An unknown error occurred with the Azure AI Foundry API.";
             if (response.status === 429) {
-                 return { text: "Azure AI API rate limit reached. Please wait a moment before trying again.", type: 'standard' };
+                 return { text: "Azure AI Foundry API rate limit reached. Please wait a moment before trying again.", type: 'standard' };
             }
             return { text: `Sorry, an error occurred: ${errorText}`, type: 'standard' };
         }
@@ -250,7 +255,7 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
         return { text: displayText, groundingChunks, type, platform };
 
     } catch (error: any) {
-        console.error("Error calling Azure AI API:", error);
+        console.error("Error calling Azure AI Foundry API:", error);
         return {
             text: "I'm sorry, but I've encountered a network error. Please check your connection and try again.",
             type: 'standard'

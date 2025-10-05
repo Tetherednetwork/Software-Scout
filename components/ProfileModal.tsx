@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import type { Session, UserDevice } from '../types';
 import { CloseIcon, PlusIcon, LaptopIcon, PencilIcon, TrashIcon, CheckCircleIcon } from './Icons';
@@ -18,7 +18,7 @@ const emptyDevice: Omit<UserDevice, 'id' | 'user_id' | 'created_at'> = {
     device_name: '', manufacturer: '', model: '', serial_number: '', os: 'Windows 11'
 };
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, session, userDevices, onDevicesUpdate }) => {
+export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, session, userDevices, onDevicesUpdate }) => {
     const [selectedAvatar, setSelectedAvatar] = useState(session?.user?.user_metadata?.avatar_url || '');
     const [isSavingAvatar, setIsSavingAvatar] = useState(false);
     
@@ -313,5 +313,3 @@ const DeviceForm: React.FC<{device: Partial<UserDevice>, onSave: (device: Partia
         </form>
     );
 };
-
-export default ProfileModal;

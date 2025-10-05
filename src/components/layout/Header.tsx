@@ -103,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <button onClick={() => onNavClick('home')} className="flex items-center">
-                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-20 w-auto" />
+                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-14 w-auto dark:filter dark:brightness-0 dark:invert" />
                             </button>
                         </div>
 
@@ -116,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                         <div className="flex items-center gap-2">
                             <div className="hidden lg:flex items-center gap-2">
                                 <div className="flex items-center gap-4" data-tour-id="header-profile-link">
-                                    {session ? (
+                                    {session && (
                                         <>
                                             <button onClick={onProfileClick} className="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">
                                                 <img src={session.user?.user_metadata?.avatar_url || '/images/logo.png'} alt="user avatar" className="h-8 w-8 rounded-full object-cover" />
@@ -124,15 +124,10 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                                             </button>
                                             <button onClick={handleLogout} className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">Logout</button>
                                         </>
-                                    ) : (
-                                        <>
-                                            <button onClick={onLoginClick} className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">Login</button>
-                                            <button onClick={onLoginClick} className="px-4 py-2 text-sm font-semibold rounded-md text-white bg-[#355E3B] hover:bg-[#2A482E]">Sign Up</button>
-                                        </>
                                     )}
                                 </div>
 
-                                <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+                                {session && <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>}
 
                                 <button
                                     onClick={onStartTour}
@@ -175,6 +170,27 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                     <div className="lg:hidden" id="mobile-menu">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
                              {navLinks.map(link => <NavLink key={link.page} {...link} isMobile />)}
+                             <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+                                {session ? (
+                                    <div className="px-3 space-y-2">
+                                        <button onClick={() => { onProfileClick(); setIsMobileMenuOpen(false); }} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
+                                            My Profile
+                                        </button>
+                                        <button onClick={handleLogout} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
+                                            Logout
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="px-3 space-y-2">
+                                        <button onClick={() => { onLoginClick(); setIsMobileMenuOpen(false); }} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
+                                            Login
+                                        </button>
+                                        <button onClick={() => { onLoginClick(); setIsMobileMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-lg font-semibold rounded-md text-white bg-[#355E3B] hover:bg-[#2A482E]">
+                                            Sign Up
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

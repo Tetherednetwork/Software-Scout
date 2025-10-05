@@ -17,7 +17,8 @@ import SafetyActionModal from './components/SafetyActionModal';
 import { FileIcon, InformationIcon } from './components/Icons';
 import OnboardingTour from './components/OnboardingTour';
 import LoginModal from './components/LoginModal';
-import ProfileModal from './components/ProfileModal';
+// FIX: Changed to a named import for ProfileModal to match its export.
+import { ProfileModal } from './components/ProfileModal';
 import { supabase } from './services/supabase';
 import AboutPage from './components/AboutPage';
 import ForumPage from './components/ForumPage';
