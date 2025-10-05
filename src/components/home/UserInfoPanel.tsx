@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session } from '../../types';
@@ -213,7 +211,7 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
                     <button 
                         onClick={runSpeedTest}
                         data-tour-id="speed-test"
-                        className={`font-semibold transition-colors rounded-md px-2 -mx-2 py-1 -my-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${isTestingSpeed ? 'text-yellow-500' : (speed > 0 ? speedColorClass : 'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300')}`}
+                        className={`font-semibold transition-colors rounded-md px-2 -mx-2 py-1 -my-1 focus:outline-none focus-visible:ring-green-500 ${isTestingSpeed ? 'text-yellow-500' : (speed > 0 ? speedColorClass : 'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300')}`}
                         title={isTestingSpeed ? "Test in progress... Click to cancel" : "Click to check your internet speed"}
                     >
                         {isTestingSpeed ? (
@@ -238,21 +236,13 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
             </div>
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                {session ? (
+                {session && (
                     <button 
                         onClick={handleLogout}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
                     >
                         <LogoutIcon />
                         <span>Logout</span>
-                    </button>
-                ) : (
-                     <button
-                        onClick={onLoginClick}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        <SignInIcon />
-                        <span>Sign In / Sign Up</span>
                     </button>
                 )}
             </div>

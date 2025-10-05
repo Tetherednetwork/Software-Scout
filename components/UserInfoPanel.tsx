@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../services/supabase';
 import type { Session } from '../types';
@@ -239,21 +237,13 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, on
             </div>
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                {session ? (
+                {session && (
                     <button 
                         onClick={handleLogout}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
                     >
                         <LogoutIcon />
                         <span>Logout</span>
-                    </button>
-                ) : (
-                     <button
-                        onClick={onLoginClick}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        <SignInIcon />
-                        <span>Sign In / Sign Up</span>
                     </button>
                 )}
             </div>

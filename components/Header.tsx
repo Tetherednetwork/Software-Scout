@@ -42,6 +42,10 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
         return () => clearInterval(intervalId); // Cleanup on unmount
     }, [topBarMessages.length]);
 
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    };
+
     const navLinks = [
         { name: 'Home', page: 'home' },
         { name: 'About', page: 'about' },
@@ -94,11 +98,21 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                         {/* Right Side Controls & Hamburger */}
                         <div className="flex items-center gap-2">
                             <div className="hidden lg:flex items-center gap-2">
-                                {session && (
+                                {session ? (
                                     <div className="flex items-center gap-4" data-tour-id="header-profile-link">
                                         <button onClick={onProfileClick} className="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">
                                             <img src={session.user?.user_metadata?.avatar_url || '/images/logo.png'} alt="user avatar" className="h-8 w-8 rounded-full object-cover" />
                                             <span>My Profile</span>
+                                        </button>
+                                         <button onClick={handleLogout} className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">Logout</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={onLoginClick} className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-4 py-2 rounded-md">
+                                            Login
+                                        </button>
+                                        <button onClick={onLoginClick} className="text-lg font-semibold text-white bg-[#355E3B] hover:bg-[#2A482E] transition-colors px-4 py-2 rounded-md">
+                                            Sign Up
                                         </button>
                                     </div>
                                 )}
@@ -151,6 +165,9 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                                     <div className="px-3 space-y-2">
                                         <button onClick={() => { onProfileClick(); setIsMobileMenuOpen(false); }} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
                                             My Profile
+                                        </button>
+                                        <button onClick={handleLogout} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
+                                            Logout
                                         </button>
                                     </div>
                                 ) : (

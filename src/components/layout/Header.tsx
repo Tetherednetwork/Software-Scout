@@ -116,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                         <div className="flex items-center gap-2">
                             <div className="hidden lg:flex items-center gap-2">
                                 <div className="flex items-center gap-4" data-tour-id="header-profile-link">
-                                    {session && (
+                                    {session ? (
                                         <>
                                             <button onClick={onProfileClick} className="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">
                                                 <img src={session.user?.user_metadata?.avatar_url || '/images/logo.png'} alt="user avatar" className="h-8 w-8 rounded-full object-cover" />
@@ -124,6 +124,15 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                                             </button>
                                             <button onClick={handleLogout} className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg">Logout</button>
                                         </>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <button onClick={onLoginClick} className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-4 py-2 rounded-md">
+                                                Login
+                                            </button>
+                                            <button onClick={onLoginClick} className="text-lg font-semibold text-white bg-[#355E3B] hover:bg-[#2A482E] transition-colors px-4 py-2 rounded-md">
+                                                Sign Up
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
 
