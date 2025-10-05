@@ -146,22 +146,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="password-legacy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                                        <div className="flex justify-between items-baseline mb-1">
+                                            <label htmlFor="password-legacy" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                            {viewMode === 'signIn' && (
+                                                <button type="button" onClick={() => { setViewMode('resetPassword'); setError(null); }} className="text-sm font-semibold text-[#355E3B] dark:text-green-400 hover:underline">
+                                                    Forgot Password?
+                                                </button>
+                                            )}
+                                        </div>
                                         <input
                                             id="password-legacy" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                                             className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
                                             placeholder="••••••••" required
                                         />
                                     </div>
-
-                                    {viewMode === 'signIn' && (
-                                        <div className="text-right -mt-2">
-                                            <button type="button" onClick={() => { setViewMode('resetPassword'); setError(null); }} className="text-sm font-semibold text-[#355E3B] dark:text-green-400 hover:underline">
-                                                Forgot Password?
-                                            </button>
-                                        </div>
-                                    )}
-
+                                    
                                     {viewMode === 'signUp' && (
                                         <>
                                             <div>
