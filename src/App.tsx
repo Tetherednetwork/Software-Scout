@@ -23,7 +23,6 @@ import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import FileVerifierPage from './pages/FileVerifierPage';
 import { UserInfoPanel } from './components/home/UserInfoPanel';
-import LanguageSwitcher from './components/ui/LanguageSwitcher';
 
 // Define the interface for the exposed ChatWindow methods
 export interface ChatWindowRef {
@@ -322,9 +321,6 @@ const AppContent: React.FC = () => {
                     </div>
                     <div className="flex flex-col items-center">
                         <SocialProof />
-                        <div className="mt-4">
-                          <LanguageSwitcher />
-                        </div>
                     </div>
                 </aside>
             </div>
