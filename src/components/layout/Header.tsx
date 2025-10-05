@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Session } from '../../types';
 import { supabase } from '../../services/supabase';
-import { UserIcon, CloseIcon, InformationIcon, FileIcon } from '../ui/Icons';
-import ThemeSwitcher from '../ui/ThemeSwitcher';
+import { CloseIcon, InformationIcon, FileIcon, SunIcon, MoonIcon } from '../ui/Icons';
 
 interface HeaderProps {
     session: Session | null;
@@ -21,6 +20,24 @@ const MenuIcon: React.FC<{ className?: string }> = ({ className = "h-6 w-6" }) =
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
     </svg>
 );
+
+// Inlined ThemeSwitcher to resolve module path issue in build environment
+const ThemeSwitcher: React.FC<{ theme: 'light' | 'dark'; toggleTheme: () => void; }> = ({ theme, toggleTheme }) => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    const title = `Switch to ${nextTheme} mode`;
+    
+    return (
+        <button
+            onClick={toggleTheme}
+            className="p-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-500 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 focus:ring-green-500"
+            aria-label={title}
+            title={title}
+        >
+            {theme === 'light' ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}
+        </button>
+    );
+};
+
 
 const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLoginClick, onProfileClick, theme, toggleTheme, onStartTour, onOpenDownloadHistoryModal }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

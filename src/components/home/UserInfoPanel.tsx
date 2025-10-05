@@ -9,13 +9,6 @@ interface UserInfoPanelProps {
     onProfileClick: () => void;
 }
 
-const SpeedIcon: React.FC<{ className?: string }> = ({ className = 'h-5 w-5 text-gray-600' }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-);
-
-
 export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, onProfileClick }) => {
     const [speed, setSpeed] = useState<number>(0);
     const [isTestingSpeed, setIsTestingSpeed] = useState<boolean>(false);

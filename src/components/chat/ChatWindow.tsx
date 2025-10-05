@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import type { Message, SoftwareFilter, DownloadHistoryItem, AIProvider, Session } from '../../types';
 import { findSoftware } from '../../services/aiService';
 import MessageItem from './MessageItem';

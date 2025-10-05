@@ -253,9 +253,10 @@ const AppContent: React.FC = () => {
         case 'forum':
             return <ForumPage />;
         case 'blogs':
-            return <BlogPage onSelectPost={handleSelectPost} onCreatePost={() => {}} />;
+// FIX: Removed `onCreatePost` prop as it is not defined in `BlogPageProps`.
+            return <BlogPage onSelectPost={handleSelectPost} />;
         case 'blog-post':
-            return selectedPostId ? <BlogPostPage postId={selectedPostId} onBack={() => handleNavClick('blogs')} /> : <BlogPage onSelectPost={handleSelectPost} onCreatePost={() => {}} />;
+            return selectedPostId ? <BlogPostPage postId={selectedPostId} onBack={() => handleNavClick('blogs')} /> : <BlogPage onSelectPost={handleSelectPost} />;
         case 'file-verifier':
             return <FileVerifierPage />;
         default:

@@ -7,10 +7,9 @@ import { PlusIcon } from './components/Icons';
 
 interface BlogPageProps {
     onSelectPost: (postId: string) => void;
-    onCreatePost: () => void;
 }
 
-const BlogPage: React.FC<BlogPageProps> = ({ onSelectPost, onCreatePost }) => {
+const BlogPage: React.FC<BlogPageProps> = ({ onSelectPost }) => {
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
     useEffect(() => {

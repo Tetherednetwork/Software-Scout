@@ -1,5 +1,5 @@
-import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
-import { GroundingChunk, Message, SoftwareFilter, TrendingTopic, Platform, Session, UserDevice } from '../types';
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GroundingChunk, Message, SoftwareFilter, Platform, Session, UserDevice } from '../types';
 import { supabase } from './supabase';
 
 if (!process.env.API_KEY) {
@@ -240,7 +240,7 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
             },
         });
 
-        const rawText = response.text;
+        const rawText = response.text ?? '';
         const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks as GroundingChunk[] | undefined;
         
         // Default response values

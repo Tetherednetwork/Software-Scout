@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session, UserDevice } from '../../types';
 import { CloseIcon, PlusIcon, LaptopIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '../ui/Icons';

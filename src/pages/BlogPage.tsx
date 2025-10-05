@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getBlogPosts } from '../services/blogService';
 import type { BlogPost } from '../types';
-import { PlusIcon } from '../components/ui/Icons';
 
 interface BlogPageProps {
     onSelectPost: (postId: string) => void;
-    onCreatePost: () => void;
 }
 
-const BlogPage: React.FC<BlogPageProps> = ({ onSelectPost, onCreatePost }) => {
+const BlogPage: React.FC<BlogPageProps> = ({ onSelectPost }) => {
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
     useEffect(() => {

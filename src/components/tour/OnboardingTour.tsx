@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CloseIcon, ChevronLeftIcon, ChevronRightIcon } from '../ui/Icons';
+import { CloseIcon } from '../ui/Icons';
 
 interface TourStep {
     selector: string;
