@@ -85,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
     );
 
     return (
-        <div className="sticky top-0 z-40">
+        <header className="sticky top-0 z-40 isolation-isolate">
             {/* Top Bar */}
             <div className="bg-[#355E3B] text-white text-lg font-semibold">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-9 overflow-hidden">
@@ -103,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <button onClick={() => onNavClick('home')} className="flex items-center">
-                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-14 w-auto" />
+                                <img src="/images/logo.png" alt="SoftMonk Icon" className="h-20 w-auto" />
                             </button>
                         </div>
 
@@ -179,7 +179,7 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                     </div>
                 )}
             </nav>
-        </div>
+        </header>
     );
 };
 

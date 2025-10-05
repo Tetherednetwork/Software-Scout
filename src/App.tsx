@@ -277,7 +277,7 @@ const AppContent: React.FC = () => {
         onOpenDownloadHistoryModal={openDownloadHistoryModal}
       />
       
-      <main className="flex-1 flex flex-col min-h-0">
+      <main className="flex-1 flex flex-col min-h-0 isolation-isolate">
         {currentPage === 'home' ? (
              <div className="w-full max-w-screen-2xl mx-auto lg:grid lg:grid-cols-[288px_1fr_288px] gap-6 px-4 flex-1 min-h-0">
         

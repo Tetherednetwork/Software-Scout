@@ -12,7 +12,7 @@ const Footer: React.FC<FooterProps> = ({ onPrivacyClick, onCookiePolicyClick, on
     const githubUrl = "https://github.com/Tetherednetwork/softmonk";
 
     return (
-        <footer className="w-full text-center p-4 mt-1 md:mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <footer className="w-full text-center p-4 mt-1 md:mt-2 text-sm text-gray-500 dark:text-gray-400 isolation-isolate">
             <p>© {year} SoftMonk. All rights reserved.</p>
             <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 mt-2">
                  <button onClick={onPrivacyClick} className="hover:underline text-[#355E3B] hover:text-[#2A482E] dark:text-[#69B870] dark:hover:text-[#85c78a] rounded-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 focus:ring-[#4F8A54]">

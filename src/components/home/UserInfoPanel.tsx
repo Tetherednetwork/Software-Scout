@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session } from '../../types';
@@ -150,18 +151,24 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
 
     const ProfileSection = () => (
         <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
-                 {avatarUrl ? (
-                    <img src={avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
-                ) : (
-                    <UserIcon className="h-8 w-8 text-gray-500 dark:text-gray-400" />
-                )}
-            </div>
+            {session && (
+                <div className="w-12 h-12 flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+                    {avatarUrl ? (
+                        <img src={avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
+                    ) : (
+                        <UserIcon className="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                    )}
+                </div>
+            )}
             <div className="min-w-0">
                 <p className="font-bold text-gray-800 dark:text-gray-200 text-lg">
                     {session ? 'Welcome!' : 'Welcome, Guest!'}
                 </p>
-                {session && <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={session.user.email}>{session.user.email}</p>}
+                {session ? (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={session.user.email}>{session.user.email}</p>
+                ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Sign in to save your history.</p>
+                )}
             </div>
         </div>
     );
