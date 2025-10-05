@@ -6,6 +6,7 @@ import process from 'process';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
+    base: './',
     plugins: [react()],
     define: {
       'process.env.API_KEY': JSON.stringify(env.VITE_API_KEY),
