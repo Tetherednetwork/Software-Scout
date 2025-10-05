@@ -1,6 +1,6 @@
 import React from 'react';
 import type { SoftwareFilter, AIProvider } from '../../types';
-import { FilterIcon, TrashIcon, GeminiIcon, OpenAIIcon, CopilotIcon, DeepSeekIcon } from '../ui/Icons';
+import { FilterIcon, TrashIcon, GeminiIcon, OpenAIIcon, AzureAIIcon, DeepSeekIcon } from '../ui/Icons';
 
 interface FilterControlsProps {
     activeFilter: SoftwareFilter;
@@ -9,7 +9,7 @@ interface FilterControlsProps {
     activeProvider: AIProvider;
     onProviderChange: (provider: AIProvider) => void;
     isOpenAIEnabled: boolean;
-    isCopilotEnabled: boolean;
+    isAzureEnabled: boolean;
     isDeepSeekEnabled: boolean;
     isHistoryEnabled: boolean;
 }
@@ -21,7 +21,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
     activeProvider,
     onProviderChange,
     isOpenAIEnabled,
-    isCopilotEnabled,
+    isAzureEnabled,
     isDeepSeekEnabled,
     isHistoryEnabled
 }) => {
@@ -78,14 +78,14 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                          <span className="font-semibold text-gray-700 dark:text-gray-200">OpenAI</span>
                     </button>
                     <button
-                        onClick={() => onProviderChange('copilot')}
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full transition-all duration-200 ${!isCopilotEnabled ? 'opacity-50' : ''} ${activeProvider === 'copilot' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'hover:bg-white/50 dark:hover:bg-gray-700/50'}`}
-                        title={isCopilotEnabled ? "Use Microsoft Copilot" : "Copilot API key not configured"}
+                        onClick={() => onProviderChange('azure')}
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full transition-all duration-200 ${!isAzureEnabled ? 'opacity-50' : ''} ${activeProvider === 'azure' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'hover:bg-white/50 dark:hover:bg-gray-700/50'}`}
+                        title={isAzureEnabled ? "Use Azure AI" : "Azure AI API key not configured"}
                         role="radio"
-                        aria-checked={activeProvider === 'copilot'}
+                        aria-checked={activeProvider === 'azure'}
                     >
-                        <CopilotIcon className="h-5 w-5" />
-                         <span className="font-semibold text-gray-700 dark:text-gray-200">Copilot</span>
+                        <AzureAIIcon className="h-5 w-5" />
+                         <span className="font-semibold text-gray-700 dark:text-gray-200">Azure</span>
                     </button>
                     <button
                         onClick={() => onProviderChange('deepseek')}

@@ -17,7 +17,7 @@ interface ChatWindowProps {
 
 // Check for API keys at the module level.
 const isOpenAIEnabled = !!process.env.OPENAI_API_KEY;
-const isCopilotEnabled = !!process.env.COPILOT_API_KEY;
+const isAzureEnabled = !!process.env.AZURE_API_KEY;
 const isDeepSeekEnabled = !!process.env.DEEPSEEK_API_KEY;
 
 
@@ -104,7 +104,7 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
 
         const providers = {
             openai: { enabled: isOpenAIEnabled, name: "OpenAI" },
-            copilot: { enabled: isCopilotEnabled, name: "Microsoft Copilot" },
+            azure: { enabled: isAzureEnabled, name: "Azure AI" },
             deepseek: { enabled: isDeepSeekEnabled, name: "DeepSeek" },
         };
         
@@ -203,13 +203,13 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
 
         const providerAvailability = {
             openai: isOpenAIEnabled,
-            copilot: isCopilotEnabled,
+            azure: isAzureEnabled,
             deepseek: isDeepSeekEnabled,
         };
 
         const providerNames = {
             openai: 'OpenAI',
-            copilot: 'Microsoft Copilot',
+            azure: 'Azure AI',
             deepseek: 'DeepSeek',
         };
 
@@ -282,7 +282,7 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
                 activeProvider={provider}
                 onProviderChange={handleProviderChange}
                 isOpenAIEnabled={isOpenAIEnabled}
-                isCopilotEnabled={isCopilotEnabled}
+                isAzureEnabled={isAzureEnabled}
                 isDeepSeekEnabled={isDeepSeekEnabled}
                 isHistoryEnabled={!!session}
             />

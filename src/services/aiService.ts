@@ -1,6 +1,6 @@
 import { findSoftware as findSoftwareGemini } from './geminiService';
 import { findSoftware as findSoftwareOpenAI } from './openAIService';
-import { findSoftware as findSoftwareCopilot } from './copilotService';
+import { findSoftware as findSoftwareAzure } from './azureService';
 import { findSoftware as findSoftwareDeepSeek } from './deepseekService';
 import type { AIProvider, Message, SoftwareFilter, Session } from '../types';
 import type { BotResponse } from './geminiService';
@@ -10,7 +10,7 @@ import type { BotResponse } from './geminiService';
  * This abstracts the logic away from the main component, allowing for easy
  * addition of new providers in the future.
  *
- * @param provider - The selected AI provider ('gemini', 'openai', 'copilot', or 'deepseek').
+ * @param provider - The selected AI provider ('gemini', 'openai', 'azure', or 'deepseek').
  * @param history - The current chat history.
  * @param filter - The active software filter.
  * @param session - The user's current session, or null if not logged in.
@@ -25,9 +25,9 @@ export const findSoftware = (
     if (provider === 'openai') {
         // Route to the OpenAI service if selected.
         return findSoftwareOpenAI(history, filter, session);
-    } else if (provider === 'copilot') {
-        // Route to the Copilot service if selected.
-        return findSoftwareCopilot(history, filter, session);
+    } else if (provider === 'azure') {
+        // Route to the Azure AI Foundry service if selected.
+        return findSoftwareAzure(history, filter, session);
     } else if (provider === 'deepseek') {
         // Route to the DeepSeek service if selected.
         return findSoftwareDeepSeek(history, filter, session);

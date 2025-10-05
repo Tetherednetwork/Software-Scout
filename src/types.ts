@@ -84,4 +84,4 @@ export type SafetyActionId =
   | 'mac-airdrop'
   | 'mac-virus-scan';
 
-export type AIProvider = 'gemini' | 'openai' | 'copilot' | 'deepseek';
+export type AIProvider = 'gemini' | 'openai' | 'azure' | 'deepseek';

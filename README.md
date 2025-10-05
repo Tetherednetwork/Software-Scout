@@ -14,7 +14,7 @@ This is a web application that helps users find safe software, games, and driver
     ```
     VITE_API_KEY=your_gemini_api_key
     VITE_OPENAI_API_KEY=your_openai_api_key
-    VITE_COPILOT_API_KEY=your_copilot_api_key
+    VITE_AZURE_API_KEY=your_azure_ai_foundry_api_key
     VITE_DEEPSEEK_API_KEY=your_deepseek_api_key
     VITE_SUPABASE_URL=your_supabase_project_url
     VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -35,6 +35,6 @@ This is a web application that helps users find safe software, games, and driver
     *   Vercel will automatically detect that this is a Vite project and set the Build Command to `npm run build` and the Output Directory to `dist`. These settings are correct.
 4.  **Add Environment Variables.**
     *   In your Vercel project's settings, go to "Environment Variables".
-    *   Add all the variables from your `.env` file (e.g., `VITE_API_KEY`, `VITE_SUPABASE_URL`).
+    *   Add all the variables from your `.env` file (e.g., `VITE_API_KEY`, `VITE_AZURE_API_KEY`, `VITE_SUPABASE_URL`).
 5.  **Deploy.**
     *   Click the "Deploy" button. Vercel will build and deploy your site. Any future pushes to your main branch will automatically trigger a new deployment.

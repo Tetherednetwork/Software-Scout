@@ -138,8 +138,8 @@ export const OpenAIIcon: React.FC<{ className?: string }> = ({ className = "h-5 
     <img src="/images/openai.png" alt="OpenAI" className={className} />
 );
 
-export const CopilotIcon: React.FC<{ className?: string }> = ({ className = "h-5 w-5" }) => (
-    <img src="/images/mscopilot.png" alt="Microsoft Copilot" className={className} />
+export const AzureAIFoundryIcon: React.FC<{ className?: string }> = ({ className = "h-5 w-5" }) => (
+    <img src="/images/mscopilot.png" alt="Azure AI Foundry" className={className} />
 );
 
 export const DeepSeekIcon: React.FC<{ className?: string }> = ({ className = "h-5 w-5" }) => (
