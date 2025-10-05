@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session } from '../../types';
-import { UserIcon, SignInIcon, LogoutIcon } from '../ui/Icons';
+import { UserIcon, LogoutIcon } from '../ui/Icons';
 
 interface UserInfoPanelProps {
     session: Session | null;
-    onLoginClick: () => void;
     onProfileClick: () => void;
 }
 
-export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, onProfileClick }) => {
+export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onProfileClick }) => {
     const [speed, setSpeed] = useState<number>(0);
     const [isTestingSpeed, setIsTestingSpeed] = useState<boolean>(false);
     const [speedTestError, setSpeedTestError] = useState<string | null>(null);

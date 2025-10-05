@@ -316,7 +316,6 @@ const AppContent: React.FC = () => {
                 <aside className="hidden lg:flex flex-col gap-4 py-4 overflow-y-auto">
                     <UserInfoPanel 
                         session={session} 
-                        onLoginClick={() => setIsLoginModalOpen(true)}
                         onProfileClick={() => setIsProfileModalOpen(true)}
                     />
                     <div className="flex-1 flex flex-col justify-center gap-4 min-h-0">

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../services/supabase';
 import type { Session } from '../types';
-import { UserIcon, SignInIcon, LogoutIcon } from './Icons';
+import { UserIcon, LogoutIcon } from './Icons';
 
 interface UserInfoPanelProps {
     session: Session | null;
-    onLoginClick: () => void;
     onProfileClick: () => void;
 }
 
@@ -16,7 +15,7 @@ const SpeedIcon: React.FC<{ className?: string }> = ({ className = 'h-5 w-5 text
 );
 
 
-const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, onProfileClick }) => {
+const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onProfileClick }) => {
     const [speed, setSpeed] = useState<number>(0);
     const [isTestingSpeed, setIsTestingSpeed] = useState<boolean>(false);
     const [speedTestError, setSpeedTestError] = useState<string | null>(null);
@@ -212,7 +211,7 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, on
                     <button 
                         onClick={runSpeedTest}
                         data-tour-id="speed-test"
-                        className={`font-semibold transition-colors rounded-md px-2 -mx-2 py-1 -my-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 ${isTestingSpeed ? 'text-yellow-500' : (speed > 0 ? speedColorClass : 'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300')}`}
+                        className={`font-semibold transition-colors rounded-md px-2 -mx-2 py-1 -my-1 focus:outline-none focus-visible:ring-green-500 ${isTestingSpeed ? 'text-yellow-500' : (speed > 0 ? speedColorClass : 'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300')}`}
                         title={isTestingSpeed ? "Test in progress... Click to cancel" : "Click to check your internet speed"}
                     >
                         {isTestingSpeed ? (
