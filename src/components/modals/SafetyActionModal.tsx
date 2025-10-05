@@ -343,7 +343,7 @@ const SafetyActionModal: React.FC<SafetyActionModalProps> = ({ actionType, onClo
                                 </span>
                                 <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{step.title}</h3>
                                 <p className="text-base font-normal text-gray-500 dark:text-gray-400">{step.description}</p>
-                                {step.media && (
+                                {'media' in step && step.media && (
                                     <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 shadow-md bg-gray-50 dark:bg-gray-900">
                                         <img 
                                             src={step.media.src} 
