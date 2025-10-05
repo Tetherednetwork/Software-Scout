@@ -240,7 +240,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#4F8A54] text-white font-semibold rounded-lg hover:bg-[#355E3B] transition-colors shadow-md"
         >
             <DownloadIcon />
-            Download from Official Site
+            Download
         </a>
     );
     

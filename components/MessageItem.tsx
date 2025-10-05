@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import type { Message, DownloadHistoryItem, Platform } from '../types';
 import { UserIcon, BotIcon, DownloadIcon, LinkIcon, SoftwareIcon, WrenchIcon, ShieldCheckIcon, YouTubeIcon, AppleIcon, LinuxIcon, AndroidIcon, GameIcon, WindowsIcon, ClipboardIcon } from './Icons';
@@ -241,7 +242,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#4F8A54] text-white font-semibold rounded-lg hover:bg-[#355E3B] transition-colors shadow-md"
         >
             <DownloadIcon />
-            Download from Official Site
+            Download
         </a>
     );
     

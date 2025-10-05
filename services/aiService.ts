@@ -1,6 +1,6 @@
 import { findSoftware as findSoftwareGemini } from './geminiService';
 import { findSoftware as findSoftwareOpenAI } from './openAIService';
-import { findSoftware as findSoftwareAzure } from './azureService';
+import { findSoftware as findSoftwareAzure } from './copilotService';
 import { findSoftware as findSoftwareDeepSeek } from './deepseekService';
 import type { AIProvider, Message, SoftwareFilter, Session } from '../types';
 import type { BotResponse } from './geminiService';

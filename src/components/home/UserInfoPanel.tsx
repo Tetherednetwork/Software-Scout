@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session } from '../../types';
@@ -13,6 +14,7 @@ interface UserInfoPanelProps {
 export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginClick, onProfileClick }) => {
     const [speed, setSpeed] = useState<number>(0);
     const [isTestingSpeed, setIsTestingSpeed] = useState<boolean>(false);
+    const [speedTestError, setSpeedTestError] = useState<string | null>(null);
     const [location, setLocation] = useState<{ country: string; code: string; } | null>(null);
     const [isFetchingLocation, setIsFetchingLocation] = useState(true);
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -76,9 +78,10 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
 
         setIsTestingSpeed(true);
         setSpeed(0);
+        setSpeedTestError(null);
 
-        // Using a reliable, CORS-enabled public test file. A 50MB file provides a good balance.
-        const testFileUrl = 'https://speed.cloudflare.com/__down?bytes=50000000';
+        // Using a smaller 10MB file to reduce timeouts on slower connections.
+        const testFileUrl = 'https://speed.cloudflare.com/__down?bytes=10000000';
         
         try {
             const response = await fetch(`${testFileUrl}&t=${Date.now()}`, { 
@@ -129,9 +132,11 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
         } catch (error: any) {
              if (error.name !== 'AbortError') {
                 console.error("Speed test failed:", error);
+                setSpeedTestError("Test failed");
                 setSpeed(0); // Show 0 on error.
              } else {
                 // User cancelled the test. Reset speed to 0.
+                setSpeedTestError(null);
                 setSpeed(0);
              }
         } finally {
@@ -219,6 +224,8 @@ export const UserInfoPanel: React.FC<UserInfoPanelProps> = ({ session, onLoginCl
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
                                 </span>
                             </span>
+                        ) : speedTestError ? (
+                            <span className="text-red-500">Failed! Retry?</span>
                         ) : speed > 0 ? (
                             <>
                                 {speed.toFixed(1)} <span className="text-xs font-normal text-gray-500 dark:text-gray-400">Mbps</span>

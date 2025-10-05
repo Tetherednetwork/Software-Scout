@@ -1,8 +1,8 @@
 import { GroundingChunk, Message, SoftwareFilter, Platform, Session, UserDevice } from '../types';
 import { supabase } from './supabase';
 
-if (!process.env.COPILOT_API_KEY) {
-    console.warn("COPILOT_API_KEY environment variable not set. Copilot functionality will be disabled.");
+if (!process.env.AZURE_API_KEY) {
+    console.warn("AZURE_API_KEY environment variable not set. Azure AI functionality will be disabled.");
 }
 
 // This system instruction is adapted for a generic powerful chat model, like those powering Copilot.
@@ -18,6 +18,25 @@ Your purpose is to help users find software, games, and system drivers for multi
 
 You have five modes: "Software Finder", "Software List Finder", "Game Finder", "Installation Helper", and "Driver Finder".
 
+**CRITICAL RULE: Official Download Sources ONLY**
+Your primary, most important function is to provide direct, safe download links from OFFICIAL sources. An "official source" is a webpage where a user can directly initiate the download of the software.
+
+- **VALID SOURCES**:
+  - The software developer's own website (e.g., \`videolan.org\` for VLC).
+  - Official app stores: \`apps.apple.com\`, \`play.google.com\`, \`store.steampowered.com\`.
+  - For PC drivers, the official support/download page of the hardware manufacturer (e.g., \`support.dell.com\`).
+
+- **STRICTLY PROHIBITED SOURCES**:
+  - **Informational sites:** UNDER NO CIRCUMSTANCES should you provide a link to a news article, blog post, review, or an informational page like Wikipedia as the download source. The user wants to DOWNLOAD the software, not read about it.
+  - **Third-party download portals:** You MUST AVOID sites like CNET Download, Softpedia, FileHippo, etc. These sites often bundle adware.
+
+**Example Scenario:**
+- User asks for: "google chrome"
+- **CORRECT action:** In your response, include the line: \`*Official Source*: https://www.google.com/chrome/\`
+- **INCORRECT action (FORBIDDEN):** Including a link to \`https://en.wikipedia.org/wiki/Google_Chrome\`.
+
+If you cannot find a VALID download page as defined above, you MUST state that you cannot find a verified link for security reasons. Do NOT provide an informational link as a fallback. This rule is essential for user safety and trust.
+
 **Platform Identification**:
 - If a user's prompt for software/games doesn't state the OS, your first response MUST be to ask for it.
 - End your response with: \`[OPTIONS]: Windows, macOS, Linux, Android\`
@@ -26,7 +45,7 @@ You have five modes: "Software Finder", "Software List Finder", "Game Finder", "
 
 **"Software Finder" Mode Process (for a single, specific software request)**:
 1.  **Search the Web**: For any request about a specific piece of software, you MUST search the web to find information.
-2.  **Identify Official Source (Strict Priority)**: Your top priority is to identify the SINGLE most official source (e.g., developer's website, Apple App Store, Google Play Store). This is crucial for user security. Avoid third-party download sites.
+2.  **Identify Official Source (Strict Priority)**: You MUST follow the **CRITICAL RULE: Official Download Sources ONLY**. Your top priority is to identify the SINGLE most official source (e.g., developer's website, Apple App Store, Google Play Store). This is crucial for user security. Avoid third-party download sites.
 3.  **Gather Details and Format Response**: From the official source, find the details and formulate your response.
     *   **Success (Official Source Found)**:
         *   Present the information clearly using Markdown. Use bold headings for "**Description**", "**File Size**", etc.
@@ -103,9 +122,9 @@ export interface BotResponse {
 // Note: This function assumes a Microsoft Azure-hosted model endpoint that is compatible with the OpenAI API format.
 // This is a common setup for using models that power Copilot.
 export const findSoftware = async (history: Message[], filter: SoftwareFilter, session: Session | null): Promise<BotResponse> => {
-    if (!process.env.COPILOT_API_KEY) {
+    if (!process.env.AZURE_API_KEY) {
          return {
-            text: "The Microsoft Copilot service is not configured. The API key is missing.",
+            text: "The Azure AI service is not configured. The API key is missing.",
             type: 'standard',
         };
     }
@@ -183,7 +202,7 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.COPILOT_API_KEY}`
+                'Authorization': `Bearer ${process.env.AZURE_API_KEY}`
             },
             body: JSON.stringify({
                 model: 'gpt-4o', // Assuming access to a powerful model
@@ -196,10 +215,10 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Copilot/Azure API Error:", errorData);
-            const errorText = errorData?.error?.message || "An unknown error occurred with the Microsoft Copilot API.";
+            console.error("Azure AI API Error:", errorData);
+            const errorText = errorData?.error?.message || "An unknown error occurred with the Azure AI API.";
             if (response.status === 429) {
-                 return { text: "Microsoft Copilot API rate limit reached. Please wait a moment before trying again.", type: 'standard' };
+                 return { text: "Azure AI API rate limit reached. Please wait a moment before trying again.", type: 'standard' };
             }
             return { text: `Sorry, an error occurred: ${errorText}`, type: 'standard' };
         }
@@ -251,7 +270,7 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
         return { text: displayText, groundingChunks, type, platform };
 
     } catch (error: any) {
-        console.error("Error calling Copilot/Azure API:", error);
+        console.error("Error calling Azure AI API:", error);
         return {
             text: "I'm sorry, but I've encountered a network error. Please check your connection and try again.",
             type: 'standard'
