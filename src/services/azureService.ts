@@ -5,7 +5,7 @@ if (!process.env.AZURE_API_KEY) {
     console.warn("AZURE_API_KEY environment variable not set. Azure AI functionality will be disabled.");
 }
 
-// This system instruction is adapted for a generic powerful chat model, like those powering Azure AI Foundry.
+// This system instruction is adapted for a generic powerful chat model, like those powering Azure AI.
 // It instructs the model to find and embed URLs directly, as it doesn't have a built-in search tool like Gemini.
 const azureSystemInstruction = `You are a helpful and friendly AI assistant called "SoftMonk".
 Your purpose is to help users find software, games, and system drivers for multiple platforms: Windows, macOS, Linux, and Android.
