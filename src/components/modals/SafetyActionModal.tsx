@@ -17,17 +17,17 @@ const SafetyActionModal: React.FC<SafetyActionModalProps> = ({ actionType, onClo
                 { 
                     title: "Open System Properties", 
                     description: "Press the Windows Key, type 'Create a restore point', and press Enter.",
-                    media: { type: 'gif', src: '/assets/tutorials/win-restore-1.gif', alt: "Animation showing the Windows search bar with 'Create a restore point' being typed and selected." }
+                    media: { type: 'gif', src: '/images/tutorials/win-restore-1.gif', alt: "Animation showing the Windows search bar with 'Create a restore point' being typed and selected." }
                 },
                 { 
                     title: "Start Creation", 
                     description: "In the 'System Protection' tab, click the 'Create...' button.",
-                    media: { type: 'gif', src: '/assets/tutorials/win-restore-2.gif', alt: "Animation showing the System Properties window and the 'Create' button being clicked." }
+                    media: { type: 'gif', src: '/images/tutorials/win-restore-2.gif', alt: "Animation showing the System Properties window and the 'Create' button being clicked." }
                 },
                 { 
                     title: "Name Your Restore Point", 
                     description: "Give your restore point a descriptive name, like 'Before installing new software', and click 'Create'.",
-                    media: { type: 'gif', src: '/assets/tutorials/win-restore-3.gif', alt: "Animation showing a name being typed for the restore point and the 'Create' button being clicked." }
+                    media: { type: 'gif', src: '/images/tutorials/win-restore-3.gif', alt: "Animation showing a name being typed for the restore point and the 'Create' button being clicked." }
                 },
                 { 
                     title: "Wait for Completion", 
@@ -65,17 +65,17 @@ const SafetyActionModal: React.FC<SafetyActionModalProps> = ({ actionType, onClo
                  { 
                     title: "Open Settings", 
                     description: "Right-click the Start button and select 'Settings', or press Windows Key + I.",
-                    media: { type: 'gif', src: '/assets/tutorials/win-updates-1.gif', alt: "Animation showing the Windows Start menu being right-clicked and 'Settings' selected." }
+                    media: { type: 'gif', src: '/images/tutorials/win-updates-1.gif', alt: "Animation showing the Windows Start menu being right-clicked and 'Settings' selected." }
                 },
                 { 
                     title: "Navigate to Windows Update", 
                     description: "In the Settings window, click on 'Windows Update' from the left-hand menu (on Windows 11) or 'Update & Security' (on Windows 10).",
-                    media: { type: 'gif', src: '/assets/tutorials/win-updates-2.gif', alt: "Animation showing the Windows Update section in the Settings app." }
+                    media: { type: 'gif', src: '/images/tutorials/win-updates-2.gif', alt: "Animation showing the Windows Update section in the Settings app." }
                 },
                 { 
                     title: "Check for Updates", 
                     description: "Click the 'Check for updates' button. Windows will search for, download, and install any available updates.",
-                    media: { type: 'gif', src: '/assets/tutorials/win-updates-3.gif', alt: "Animation of the 'Check for updates' button being clicked." }
+                    media: { type: 'gif', src: '/images/tutorials/win-updates-3.gif', alt: "Animation of the 'Check for updates' button being clicked." }
                 },
                 { title: "Restart if Needed", description: "Some updates may require you to restart your computer. If so, save your work and restart when prompted." },
             ]
@@ -181,17 +181,17 @@ const SafetyActionModal: React.FC<SafetyActionModalProps> = ({ actionType, onClo
                 { 
                     title: "Open Spotlight", 
                     description: "Press Command (⌘) + Spacebar. A search bar will appear in the middle of your screen.",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-spotlight-1.gif', alt: "Animation showing the Command and Spacebar keys being pressed, and the Spotlight search bar appearing." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-spotlight-1.gif', alt: "Animation showing the Command and Spacebar keys being pressed, and the Spotlight search bar appearing." }
                 },
                 { 
                     title: "Find Anything", 
                     description: "Start typing what you're looking for. This can be an app name, a document, an email, or even a contact.",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-spotlight-2.gif', alt: "Animation showing an application name being typed into Spotlight and results appearing." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-spotlight-2.gif', alt: "Animation showing an application name being typed into Spotlight and results appearing." }
                 },
                 { 
                     title: "Perform Quick Actions", 
                     description: "You can also type calculations (e.g., '5*99'), currency conversions ('100 USD to GBP'), or definitions ('define serendipity').",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-spotlight-3.gif', alt: "Animation showing a calculation '5*99' being typed into Spotlight and the answer appearing." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-spotlight-3.gif', alt: "Animation showing a calculation '5*99' being typed into Spotlight and the answer appearing." }
                 },
                 { title: "Preview Files", description: "Use the arrow keys to highlight a result. A preview will appear on the right. Press Enter to open the selected item." }
             ]
@@ -204,17 +204,17 @@ const SafetyActionModal: React.FC<SafetyActionModalProps> = ({ actionType, onClo
                 { 
                     title: "Capture the Entire Screen", 
                     description: "Press Shift + Command (⌘) + 3. The screenshot is saved to your desktop.",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-screenshot-1.gif', alt: "Animation showing the keyboard shortcut for a full screen capture on macOS." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-screenshot-1.gif', alt: "Animation showing the keyboard shortcut for a full screen capture on macOS." }
                 },
                 { 
                     title: "Capture a Portion of the Screen", 
                     description: "Press Shift + Command (⌘) + 4. Your cursor will change to a crosshair. Drag to select the area, then release.",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-screenshot-2.gif', alt: "Animation showing a specific area of the screen being selected for a screenshot." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-screenshot-2.gif', alt: "Animation showing a specific area of the screen being selected for a screenshot." }
                 },
                 { 
                     title: "Capture a Specific Window", 
                     description: "Press Shift + Command (⌘) + 4, then press the Spacebar. The cursor becomes a camera. Click on the window you want to capture.",
-                    media: { type: 'gif', src: '/assets/tutorials/mac-screenshot-3.gif', alt: "Animation showing the window capture mode for screenshots on macOS." }
+                    media: { type: 'gif', src: '/images/tutorials/mac-screenshot-3.gif', alt: "Animation showing the window capture mode for screenshots on macOS." }
                 },
                 { title: "Open Screenshot Options", description: "Press Shift + Command (⌘) + 5 to open a control panel. Here you can record your screen, set a timer, and choose where to save captures." }
             ]
