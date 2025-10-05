@@ -1,11 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../services/supabase';
+import React from 'react';
+import { VirusScanIcon } from './Icons';
 import type { TrendingTopic } from '../types';
-import { WrenchScrewdriverIcon } from './Icons';
 
 interface TopAntivirusProps {
     onTopicClick: (topic: string) => void;
 }
+
+// FIX: Corrected the type definition for antivirusTrends. The previous type was complex and incorrect due to operator precedence.
+// The objects in the array perfectly match the TrendingTopic interface.
+const antivirusTrends: TrendingTopic[] = [
+    {
+        name: 'McAfee Total Protection',
+        description: 'Antivirus, identity and privacy protection.',
+        companyDomain: 'mcafee.com',
+    },
+    {
+        name: 'Norton 360 Deluxe',
+        description: 'Comprehensive security with VPN & more.',
+        companyDomain: 'norton.com',
+    },
+    {
+        name: 'TotalAV',
+        description: 'Award-winning antivirus & security suite.',
+        companyDomain: 'totalav.com',
+    },
+    {
+        name: 'Bitdefender Total Security',
+        description: 'Top-rated protection against all threats.',
+        companyDomain: 'bitdefender.com',
+    },
+    {
+        name: 'Avast One',
+        description: 'Free antivirus with privacy features.',
+        companyDomain: 'avast.com',
+    },
+];
 
 const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
@@ -16,81 +45,22 @@ const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     target.onerror = null; 
 };
 
-// This component now displays popular tools instead of just antivirus software.
+// This component now displays top antivirus software instead of just antivirus software.
 const TopAntivirus: React.FC<TopAntivirusProps> = ({ onTopicClick }) => {
-    const [trends, setTrends] = useState<TrendingTopic[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchTrends = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const { data, error: dbError } = await supabase
-                .from('trending_software')
-                .select('name, description, company_domain')
-                .order('rank', { ascending: true })
-                .range(5, 9); // Fetch ranks 6-10
-
-            if (dbError) {
-                if (dbError.code === '42P01') {
-                     throw new Error("The 'trending_software' table was not found.");
-                }
-                throw dbError;
-            }
-
-            const formattedData = data.map(item => ({
-                name: item.name,
-                description: item.description,
-                companyDomain: item.company_domain,
-            }));
-            setTrends(formattedData);
-        } catch (err: any) {
-            console.error("Error fetching popular tools:", err);
-            setError(err.message || "Could not load popular tools.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    
-    useEffect(() => {
-        fetchTrends();
-    }, []);
 
     return (
         <div 
             className="w-full flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
-            data-tour-id="popular-tools"
+            data-tour-id="top-antivirus"
         >
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <WrenchScrewdriverIcon />
-                    <h3 className="font-bold text-gray-800 dark:text-gray-200">Popular Tools</h3>
+                    <VirusScanIcon />
+                    <h3 className="font-bold text-gray-800 dark:text-gray-200">Top Antivirus 2025</h3>
                 </div>
-                 <button
-                    onClick={fetchTrends}
-                    disabled={isLoading}
-                    className="p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-wait transition-colors"
-                    aria-label="Refresh list"
-                    title="Refresh list"
-                >
-                    <img src="/images/sync.png" alt="Refresh icon" className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
             </div>
             <div className="p-2 space-y-1 overflow-y-auto">
-                 {isLoading ? (
-                    Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 rounded-lg animate-pulse">
-                            <div className="w-10 h-10 flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                            <div className="min-w-0 flex-1 space-y-2">
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                            </div>
-                        </div>
-                    ))
-                 ) : error ? (
-                    <p className="p-4 text-center text-sm text-red-500 dark:text-red-400">{error}</p>
-                 ) : trends.length > 0 ? trends.map((item) => (
+                 {antivirusTrends.map((item) => (
                     <button
                         key={item.name}
                         onClick={() => onTopicClick(item.name)}
@@ -109,9 +79,7 @@ const TopAntivirus: React.FC<TopAntivirusProps> = ({ onTopicClick }) => {
                             <p className="text-gray-500 dark:text-gray-400 text-xs truncate">{item.description}</p>
                         </div>
                     </button>
-                )) : (
-                     <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">No popular tools available.</p>
-                )}
+                ))}
             </div>
         </div>
     );

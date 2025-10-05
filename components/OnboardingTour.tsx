@@ -16,9 +16,9 @@ const tourSteps: TourStep[] = [
         position: 'right',
     },
     {
-        selector: '[data-tour-id="popular-tools"]',
-        title: "Popular Tools & Utilities",
-        content: "Discover more great software. This list shows other popular tools you might find useful. Click any to learn more.",
+        selector: '[data-tour-id="top-antivirus"]',
+        title: "Top Antivirus Software",
+        content: "Check out our curated list of top-rated antivirus software to keep your system protected. Click any to learn more.",
         position: 'right',
     },
     {
