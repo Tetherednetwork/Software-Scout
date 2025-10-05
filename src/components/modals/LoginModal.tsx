@@ -7,9 +7,11 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
-    const [isSignUp, setIsSignUp] = useState(false);
+    const [viewMode, setViewMode] = useState<'signIn' | 'signUp' | 'resetPassword'>('signIn');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [userRole, setUserRole] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
@@ -18,11 +20,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
         e.preventDefault();
         setError(null);
         setMessage(null);
+        
+        if (viewMode === 'signUp' && password !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+        
+        if (viewMode === 'signUp' && !userRole) {
+            setError("Please select your role.");
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            if (isSignUp) {
-                const { error } = await supabase.auth.signUp({ email, password });
+            if (viewMode === 'signUp') {
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            role: userRole
+                        }
+                    }
+                });
                 if (error) throw error;
                 setMessage("Check your email for a verification link to complete your sign-up!");
             } else {
@@ -30,6 +51,24 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
                 if (error) throw error;
                 // The onAuthStateChange listener in App.tsx will handle closing the modal
             }
+        } catch (err: any) {
+            setError(err.error_description || err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePasswordReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setMessage(null);
+        setIsLoading(true);
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin,
+            });
+            if (error) throw error;
+            setMessage("Password reset instructions have been sent to your email.");
         } catch (err: any) {
             setError(err.error_description || err.message);
         } finally {
@@ -47,6 +86,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
         }
     };
 
+    const getTitle = () => {
+        switch(viewMode) {
+            case 'signUp': return 'Create Account';
+            case 'resetPassword': return 'Reset Password';
+            default: return 'Sign In';
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 text-left relative">
@@ -55,81 +102,121 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose }) => {
                 </button>
 
                 <div className="p-8">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{isSignUp ? 'Create Account' : 'Sign In'}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">to save your chat history and downloads.</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getTitle()}</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {viewMode === 'resetPassword' ? 'Enter your email to receive reset instructions.' : 'to save your chat history and downloads.'}
+                    </p>
                     
                     {message ? (
                         <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-lg text-center">
-                            <h3 className="font-semibold text-lg">Check Your Email</h3>
-                            <p className="text-sm" dangerouslySetInnerHTML={{ __html: message }}></p>
+                            <h3 className="font-semibold text-lg">{viewMode === 'resetPassword' ? 'Instructions Sent' : 'Check Your Email'}</h3>
+                            <p className="text-sm">{message}</p>
                              <button
-                                onClick={() => { setMessage(null); setIsSignUp(false); }}
+                                onClick={() => { setMessage(null); setViewMode('signIn'); }}
                                 className="mt-4 text-sm font-semibold text-[#355E3B] hover:underline"
                             >
                                 Back to Sign In
                             </button>
                         </div>
                     ) : (
-                        <form onSubmit={handleAuth} className="mt-6 space-y-4">
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
-                                    placeholder="you@example.com"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                                <input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-                            
-                            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full px-6 py-3 bg-[#355E3B] text-white font-semibold rounded-lg hover:bg-[#2A482E] transition-colors disabled:bg-green-300 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
-                            </button>
-                            
-                            <div className="relative flex items-center justify-center my-4">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                                </div>
-                                <div className="relative bg-white dark:bg-gray-800 px-2 text-sm text-gray-500 dark:text-gray-400">OR</div>
-                            </div>
-                            
-                             <button
-                                type="button"
-                                onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                            >
-                                <GoogleIcon />
-                                Sign in with Google
-                            </button>
-
-                        </form>
+                        <>
+                            {viewMode === 'resetPassword' ? (
+                                <form onSubmit={handlePasswordReset} className="mt-6 space-y-4">
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                        <input
+                                            id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
+                                            placeholder="you@example.com" required
+                                        />
+                                    </div>
+                                    {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+                                    <button type="submit" disabled={isLoading} className="w-full px-6 py-3 bg-[#355E3B] text-white font-semibold rounded-lg hover:bg-[#2A482E] transition-colors disabled:bg-green-300 disabled:cursor-not-allowed">
+                                        {isLoading ? 'Sending...' : 'Send Reset Instructions'}
+                                    </button>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleAuth} className="mt-6 space-y-4">
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                        <input
+                                            id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
+                                            placeholder="you@example.com" required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                                        <input
+                                            id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
+                                            placeholder="••••••••" required
+                                        />
+                                    </div>
+                                    {viewMode === 'signIn' && (
+                                        <div className="text-right -mt-2">
+                                            <button type="button" onClick={() => { setViewMode('resetPassword'); setError(null); }} className="text-sm font-semibold text-[#355E3B] dark:text-green-400 hover:underline">
+                                                Forgot Password?
+                                            </button>
+                                        </div>
+                                    )}
+                                    {viewMode === 'signUp' && (
+                                        <>
+                                            <div>
+                                                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                                                <input
+                                                    id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none"
+                                                    placeholder="••••••••" required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="user_role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">I am a...</label>
+                                                <select
+                                                    id="user_role" name="user_role" value={userRole} onChange={(e) => setUserRole(e.target.value)}
+                                                    className="w-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#4F8A54] focus:outline-none" required
+                                                >
+                                                    <option value="" disabled>Select a role...</option>
+                                                    <option value="student">Student</option>
+                                                    <option value="system-engineer">System Engineer</option>
+                                                    <option value="user">User</option>
+                                                    <option value="tester">Tester</option>
+                                                </select>
+                                            </div>
+                                        </>
+                                    )}
+                                    {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+                                    <button
+                                        type="submit" disabled={isLoading}
+                                        className="w-full px-6 py-3 bg-[#355E3B] text-white font-semibold rounded-lg hover:bg-[#2A482E] transition-colors disabled:bg-green-300 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoading ? 'Processing...' : (viewMode === 'signUp' ? 'Create Account' : 'Sign In')}
+                                    </button>
+                                    <div className="relative flex items-center justify-center my-4">
+                                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-600"></div></div>
+                                        <div className="relative bg-white dark:bg-gray-800 px-2 text-sm text-gray-500 dark:text-gray-400">OR</div>
+                                    </div>
+                                    <button
+                                        type="button" onClick={handleGoogleSignIn}
+                                        className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                    >
+                                        <GoogleIcon /> Sign in with Google
+                                    </button>
+                                </form>
+                            )}
+                        </>
                     )}
 
                     <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-                        {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                        <button onClick={() => { setIsSignUp(!isSignUp); setError(null); }} className="font-semibold text-[#355E3B] hover:underline ml-1">
-                            {isSignUp ? 'Sign In' : 'Sign Up'}
-                        </button>
+                        {viewMode === 'signIn' && (
+                            <>Don't have an account? <button onClick={() => { setViewMode('signUp'); setError(null); }} className="font-semibold text-[#355E3B] hover:underline ml-1">Sign Up</button></>
+                        )}
+                        {viewMode === 'signUp' && (
+                            <>Already have an account? <button onClick={() => { setViewMode('signIn'); setError(null); }} className="font-semibold text-[#355E3B] hover:underline ml-1">Sign In</button></>
+                        )}
+                         {viewMode === 'resetPassword' && (
+                            <>Remembered your password? <button onClick={() => { setViewMode('signIn'); setError(null); }} className="font-semibold text-[#355E3B] hover:underline ml-1">Sign In</button></>
+                        )}
                     </p>
                 </div>
             </div>
