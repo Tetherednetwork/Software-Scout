@@ -253,7 +253,6 @@ const AppContent: React.FC = () => {
         case 'forum':
             return <ForumPage />;
         case 'blogs':
-// FIX: Removed `onCreatePost` prop as it is not defined in `BlogPageProps`.
             return <BlogPage onSelectPost={handleSelectPost} />;
         case 'blog-post':
             return selectedPostId ? <BlogPostPage postId={selectedPostId} onBack={() => handleNavClick('blogs')} /> : <BlogPage onSelectPost={handleSelectPost} />;
