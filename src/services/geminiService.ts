@@ -1,114 +1,68 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GroundingChunk, Message, SoftwareFilter, Platform, Session, UserDevice } from '../types';
 import { supabase } from './supabase';
+import { findInVendorMap, detectPlatform } from './vendorMapService';
 
 if (!process.env.API_KEY) {
     console.warn("API_KEY environment variable not set. Gemini functionality will be disabled.");
 }
 
-const systemInstruction = `You are SoftMonk, an AI cybersecurity assistant. Your single most important mission is to protect users by providing safe, verified, direct download links from official sources ONLY. User safety is your absolute priority. Failure to adhere to these rules can put users at risk, so you must be strict.
+const systemInstruction = `You are SoftMonk, a safe software download assistant. Your job is to confirm the exact product, provide one official download page, and verify every link before replying. You must obey the policies. You must use the tools for all links and videos. You must refuse any request that conflicts with policy.
 
-Your purpose is to help users find software, games, and system drivers for multiple platforms: Windows, macOS, Linux, and Android.
+**Core rules**
 
-**Language Constraint**: You MUST respond in English.
+- Confirm product name if confidence is low. Ask one short question only.
+- Official-first. Provide one link only, the vendor’s download page.
+- If the official page is unavailable, provide one safe directory link only from the approved list.
+- Never return Wikipedia, blogs, forums, mirrors, shorteners, or affiliate links.
+- HTTPS only. No http.
+- Always call verify_download_link on every URL you intend to send. If ok is false, do not send it.
+- Videos. Prefer the vendor’s channel. Call verify_youtube_url. If ok is false, provide the vendor’s written guide via fallback_video.
+- Show the domain in plain text, example, Domain: google.com.
+- Do not invent links. Do not guess versions. Do not scrape checksums unless the vendor page provides them.
+- Stay concise. One or two sentences. Bullets only when listing OS options.
+
+**Approved fallback directories**
+Winget source page. Chocolatey package page. Ninite package page. Microsoft Store. Apple App Store. GitHub Releases under a verified vendor org. F-Droid.
+
+**Hard refusals**
+If a user asks for cracked software, license bypass, modified installers, or random mirror links, refuse. Offer the official page.
+
+**Never do**
+- Do not answer with a link without tool verification.
+- Do not output multiple links.
+- Do not summarize YouTube videos you have not verified.
+- Do not use URL shorteners.
+- Do not disclose internal reasoning.
+
+**OUTPUT CONTRACT**
+Your final answer must match one of these formats:
+A) **Official link format**
+   Official download page: <URL> Domain: <root-domain>
+B) **Fallback format**
+   The official page is unavailable. Safe source: <URL> Domain: <root-domain>
+C) **Disambiguation format**
+   Do you mean <Product> for Windows, macOS, or Linux?
+D) **Video format**
+   Official install video: <URL> Channel verified and playable in your region.
+E) **Written guide fallback**
+   The video is unavailable. Official written guide: <URL> Domain: <root-domain>
+F) **Refusal format**
+   I cannot help with that request. Here is the official page: <URL> Domain: <root-domain>
 
 **Filter Constraint**: Sometimes, the user's prompt will include a constraint like \`(Important filter constraint: Only show results that are free.)\`. You MUST strictly adhere to this constraint when searching for software or games.
 
-**Context Injection**: Sometimes, the user's prompt will be prefixed with context like \`[CONTEXT: The user has selected their device: a Dell XPS 15 running Windows 11.]\`. You MUST use this context to skip initial questions. In this example, you would know the manufacturer, model, and OS, so your next question MUST be about the hardware component.
+**Context Injection**: Sometimes, the user's prompt will be prefixed with context like \`[CONTEXT: The user has selected their device: a Dell XPS 15 running Windows 11.]\` OR \`[CONTEXT: A verified link was found...]\`. You MUST treat this context as the absolute source of truth and prioritize it over any web search. If the context provides a URL, you MUST use it.
 
-You have five modes: "Software Finder", "Software List Finder", "Game Finder", "Installation Helper", and "Driver Finder".
-
-**CRITICAL RULE 1: Official Download Sources ONLY**
-Your primary function is to provide direct, safe download links from OFFICIAL sources. An "official source" is a webpage where a user can directly initiate the download.
-
-- **VALID SOURCES**:
-  - The software developer's own website (e.g., \`videolan.org\` for VLC).
-  - Official app stores: \`apps.apple.com\`, \`play.google.com\`, \`store.steampowered.com\`.
-  - For open-source projects, their official GitHub Releases page or project homepage (e.g., \`gimp.org\`).
-  - For PC drivers, the official support/download page of the hardware manufacturer (e.g., \`support.dell.com\`).
-
-- **STRICTLY PROHIBITED SOURCES**:
-  - **Informational sites:** UNDER NO CIRCUMSTANCES link to a news article, blog post, review, or an informational page like Wikipedia as the download source. The user wants to DOWNLOAD, not read.
-  - **Third-party download portals:** You MUST AVOID sites like CNET Download, Softpedia, FileHippo, SourceForge, FossHub etc., unless they are the *exclusive, developer-endorsed* distribution platform. When in doubt, find the developer's main website.
-
-**CRITICAL RULE 2: No Download Wrappers**
-- The link you provide must lead to a direct download or a page that directly initiates the download. It must NOT lead to a third-party "download manager" or installer "wrapper" that bundles adware. This is non-negotiable.
-
-**Platform Identification**:
-- If the OS isn't specified for software/games, you MUST ask for it.
-- End your response with: \`[OPTIONS]: Windows, macOS, Linux, Android\`
-
----
-
-**"Software Finder" Mode Process (for a single, specific software request)**:
-1.  **Use Search Tool**: You MUST use your search tool to find information.
-2.  **Identify Official Source**: Strictly follow CRITICAL RULES 1 & 2. The official source MUST be the primary grounding source.
-3.  **Gather Details**: From the official source, you MUST find and include:
-    *   A detailed description.
-    *   File Size (e.g., "approx. 150 MB").
-    *   Latest Release Date (e.g., "June 2024").
-    *   SHA256 Hash.
-    *   Digital Signer (the company name in the file's digital signature).
-    *   **Offline Installer**: Check if an "offline," "standalone," or "full" installer is available. If so, mention it. Example: "An offline installer is available, which is recommended as it's less likely to include unwanted offers."
-    *   **Bundled Software Warning**: If the official installer is known to commonly include optional software (e.g., McAfee with Adobe Reader), you MUST warn the user. Example: "Be careful during installation: uncheck any optional offers for software you don't want."
-    *   If any detail isn't available, state "Not specified".
-4.  **Formulate Your Response**:
-    *   **Success**:
-        *   Present info clearly using Markdown. Use bold headings.
-        *   The link MUST be provided exclusively through the search grounding tool. Your text response MUST NOT contain URLs.
-        *   After details, ask: "Would you like help installing this?"
-        *   Conclude with the tag: \`[TYPE]: software-details-[platform]\`.
-    *   **Failure**:
-        *   Respond: "For your security, I could not find a verified official download source for that software and cannot provide a download link."
-
----
-
-**"Software List Finder" Mode (For queries like "top", "best", "list")**:
-1.  **Use Search Tool**: Find multiple recommendations and their official download pages.
-2.  **Format Response STRICTLY**:
-    *   Embed the URL directly into the \`*Official Source*\` line for EACH item. Do NOT use the grounding tool for this mode.
-    *   Template for each item:
-        [START_ITEM]
-        **[Item Number]. [Software Name]**
-        *Description*: [A brief, one-sentence description].
-        *Official Source*: [The full, direct URL].
-        [END_ITEM]
-    *   Tag your response: \`[TYPE]: software-list-[platform]\`.
-
----
-
-**"Game Finder" Mode Process**:
-Follows the same rules as "Software Finder" or "Software List Finder". Tag single games as \`[TYPE]: game-details-[platform]\`.
-
----
-
-**"Installation Helper" Mode Process**:
-1.  **Provide Text Steps First**: You MUST always provide a clear, step-by-step text guide for installing the software on the user's specified OS.
-    *   **Important Safety Tip**: Your instructions MUST include this safety tip: "During installation, always look for a 'Custom' or 'Advanced' option. This allows you to see and uncheck any bundled software or optional add-ons you do not want."
-    *   **Modern Practices**: Assume the user has the downloaded installer file. Focus on modern install practices (e.g., double-clicking a file in 'Downloads'). Do NOT mention CDs/DVDs.
-2.  **Search for a Supplemental Video**: After providing the text steps, use your search tool to find a relevant YouTube video installation guide.
-3.  **Formulate Response**:
-    *   Start with the text-based step-by-step guide.
-    *   **If a video is found**: After the text steps, add a new section: "For a visual guide, here is a helpful video.". The video link MUST be provided exclusively through the search grounding tool.
-    *   **If no video is found**: Simply end the response after the text steps. Do not mention a video.
-    *   Conclude the entire response with the tag: \`[TYPE]: installation-guide\`.
-
----
-
-**"Driver Finder" Mode Process (Windows PCs Only)**:
-This is a strict, multi-step process. You MUST ask one question at a time.
-
-1.  **If the manufacturer is unknown**: Your ONLY response must be to ask for the manufacturer. End with: \`[OPTIONS]: Dell, HP, Lenovo, ASUS, Acer, MSI, Samsung, Other\` and tag your response \`[TYPE]: driver-input-prompt\`.
-2.  **After the user provides the manufacturer**: Your ONLY response must be to ask for the PC's model or serial number. Do not ask for anything else. Tag your response \`[TYPE]: driver-input-prompt\`.
-3.  **After the user provides the model/serial**: Your ONLY response must be to ask for the operating system. End with: \`[OPTIONS]: Windows 11, Windows 10 (64-bit), Windows 10 (32-bit), Windows 8.1, Windows 7\` and tag \`[TYPE]: driver-input-prompt\`.
-4.  **After the user provides the OS**: Your ONLY response must be to ask for the hardware component. End with: \`[OPTIONS]: All Drivers, Graphics Card, Network/Wi-Fi, Audio/Sound, Chipset, BIOS, Other\` and tag \`[TYPE]: driver-input-prompt\`.
-5.  **Final Step: Search and Respond**: Once you have all information (manufacturer, model, OS, component), use your search tool to find the SINGLE official OEM driver download page.
-    *   **Search Strategy**: Aim for the exact page for the user's serial number.
-    *   **Response**:
-        *   Provide a brief summary.
-        *   If the page mentions **WHQL certification** (Windows Hardware Quality Labs), state this. Example: "This driver is WHQL certified by Microsoft, ensuring stability."
-        *   The link MUST be provided exclusively through the search grounding tool.
-        *   Conclude with tag: \`[TYPE]: driver-details\`.`;
+**RISK CHECKLIST BEFORE EVERY REPLY**
+Run internally and enforce:
+[ ] Product confirmed or disambiguation asked
+[ ] Official site found or safe directory chosen
+[ ] verify_download_link.ok is true
+[ ] HTTPS true, no shortener, no typosquat, not blocked
+[ ] For videos, verify_youtube_url.ok is true
+[ ] Output matches the Output Contract exactly
+`;
 
 
 export interface BotResponse {
@@ -129,25 +83,34 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
     try {
-        const historyCopy = JSON.parse(JSON.stringify(history)); // Deep copy to avoid mutating state
+        const historyCopy = JSON.parse(JSON.stringify(history)); 
         const lastUserMessage = historyCopy[historyCopy.length - 1];
-        const lastBotMessage = [...historyCopy].reverse().find(m => m.sender === 'bot');
+        const lastBotMessage = [...historyCopy].reverse().find((m: Message) => m.sender === 'bot');
 
-        // --- New Device Context Flow Logic ---
+        // --- Vendor Map & Device Context Flow Logic ---
         if (session && lastUserMessage) {
             const lowerCaseText = lastUserMessage.text.toLowerCase();
-            
-            // Keywords that trigger a check for saved devices.
-            const requestKeywords = ['driver', 'software', 'game', 'app', 'tool', 'utility'];
-            
-            // Check if this is a new request that could use device context.
-            const isNewSoftwareDriverGameRequest = 
-                requestKeywords.some(keyword => lowerCaseText.includes(keyword)) &&
-                !lastUserMessage.text.startsWith('[CONTEXT:') &&
-                lastBotMessage?.type !== 'driver-device-prompt' &&
-                lastBotMessage?.type !== 'driver-device-selection';
+            const isNewRequest = !lastUserMessage.text.startsWith('[CONTEXT:') && (!lastBotMessage || !lastBotMessage.text.includes('[OPTIONS]:'));
 
-            // 1. Initial request: check for saved devices
+            // 1. Check vendor map first for new requests
+            if (isNewRequest) {
+                const foundSoftware = await findInVendorMap(lastUserMessage.text);
+                if (foundSoftware) {
+                    const platform = detectPlatform(lastUserMessage.text);
+                    const url = platform ? foundSoftware[platform as keyof typeof foundSoftware] : null;
+
+                    if (url && typeof url === 'string') {
+                        const context = `[CONTEXT: A verified link for ${foundSoftware.name} for ${platform} was found in our curated map: ${url}. When you use your search tool, you MUST prioritize this URL and use it as the grounding source. Do not search for any other links.]`;
+                        lastUserMessage.text = `${context}\n\nOriginal request: "${lastUserMessage.text}"`;
+                    }
+                }
+            }
+
+            // 2. Standard device context flow
+            const requestKeywords = ['driver', 'software', 'game', 'app', 'tool', 'utility'];
+            const isNewSoftwareDriverGameRequest = 
+                requestKeywords.some(keyword => lowerCaseText.includes(keyword)) && isNewRequest;
+
             if (isNewSoftwareDriverGameRequest) {
                 const { data: devices } = await supabase.from('user_devices').select('*').eq('user_id', session.user.id);
                 if (devices && devices.length > 0) {
@@ -155,7 +118,6 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
                 }
             }
             
-            // 2. User replied "Yes": show device list
             if (lastUserMessage.text === 'Yes, for a saved device' && lastBotMessage?.type === 'driver-device-prompt') {
                 const { data: devices } = await supabase.from('user_devices').select('*').eq('user_id', session.user.id);
                 if (devices && devices.length > 0) {
@@ -164,122 +126,80 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
                 }
             }
             
-            // 3. User selected a device: Inject context and re-process the original request
             if (lastBotMessage?.type === 'driver-device-selection') {
                 const { data: devices } = await supabase.from('user_devices').select('*').eq('user_id', session.user.id);
                 const selectedDevice = devices?.find((d: UserDevice) => lastUserMessage.text.startsWith(d.device_name));
                 
                 if (selectedDevice) {
-                    // Find the user's original request (before we asked about devices). It's the third-to-last user message in the sequence.
                     const originalRequestMessage = historyCopy.filter((m: Message) => m.sender === 'user').slice(-3, -2)[0];
-
                     if (originalRequestMessage) {
-                         // Formulate a new prompt for the AI by combining context and the original request.
                         const context = `[CONTEXT: The user has selected their device: a ${selectedDevice.manufacturer} ${selectedDevice.model} running ${selectedDevice.os}.]`;
                         lastUserMessage.text = `${context}\n\nBased on this context, please process my original request: "${originalRequestMessage.text}"`;
                     }
                 }
             }
         }
-        // --- End New Device Context Flow Logic ---
+        // --- End Context Flow Logic ---
 
-        // Find the last user message to append the filter context
         const lastUserMessageIndex = historyCopy.map((m: Message) => m.sender).lastIndexOf('user');
         
         if (lastUserMessageIndex !== -1 && filter !== 'all') {
-            // Prevent adding filter text to context-injected prompts
             if (!historyCopy[lastUserMessageIndex].text.startsWith('[CONTEXT:')) {
                  historyCopy[lastUserMessageIndex].text += `\n\n(Important filter constraint: Only show results that are ${filter}.)`;
             }
         }
 
         const contents = historyCopy
-            .slice(1) // Remove initial greeting from history
+            .slice(1) 
             .map((msg: Message) => ({
                 role: msg.sender === 'user' ? 'user' : 'model',
                 parts: [{ text: msg.text }]
             }));
 
         if (contents.length === 0) {
-             return {
-                text: "I'm sorry, I didn't get that. Could you please repeat your request?",
-                type: 'standard',
-            };
+             return { text: "I'm sorry, I didn't get that. Could you please repeat your request?", type: 'standard' };
         }
         
         const response: GenerateContentResponse = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: contents, // Pass modified conversation history
+            contents: contents, 
             config: {
                 systemInstruction: systemInstruction,
                 tools: [{ googleSearch: {} }],
+                temperature: 0.2,
+                topP: 0.8
             },
         });
 
         const rawText = response.text ?? '';
         const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks as GroundingChunk[] | undefined;
         
-        // Default response values
         let type: BotResponse['type'] = 'standard';
         let platform: BotResponse['platform'] = undefined;
 
-        // Use regex to find and extract the [TYPE] tag
-        const typeMatch = rawText.match(/\[TYPE\]:\s*([\w-]+)/);
-
-        if (typeMatch) {
-            const tag = typeMatch[1]; // e.g., "software-details-windows" or "installation-guide"
-            
-            if (tag.startsWith('software-list-')) {
-                type = 'software-list';
-                const potentialPlatform = tag.replace('software-list-', '') as Platform;
-                if (['windows', 'macos', 'linux', 'android'].includes(potentialPlatform)) {
-                    platform = potentialPlatform;
-                }
-            } else if (tag === 'installation-guide') {
-                type = 'installation-guide';
-                // For installation guides, the platform context comes from the previous message.
-                const lastBotMessage = [...history].reverse().find(m => m.sender === 'bot' && (m.type === 'software' || m.type === 'game' || m.type === 'software-list'));
-                if (lastBotMessage) {
-                    platform = lastBotMessage.platform;
-                }
-            } else {
-                const parts = tag.split('-');
-                const mainType = parts[0] as 'software' | 'game' | 'driver';
-                if (['software', 'game', 'driver'].includes(mainType)) {
-                     type = mainType;
-                }
-
-                if (tag === 'driver-input-prompt' || tag === 'driver-device-prompt' || tag === 'driver-device-selection') {
-                    type = tag;
-                }
-
-                // Check for a platform in the tag (e.g., software-details-windows)
-                if (parts.length > 2) {
-                    const potentialPlatform = parts[2] as Platform;
-                    if (['windows', 'macos', 'linux', 'android'].includes(potentialPlatform)) {
-                        platform = potentialPlatform;
-                    }
-                }
-            }
-        } else {
-            // Fallback logic for standard messages or if the model forgets the tag for an installation guide.
-            const lowerCaseText = rawText.toLowerCase();
-            const lastBotMessage = [...history].reverse().find(m => m.sender === 'bot');
-             if ((lastBotMessage?.type === 'software' || lastBotMessage?.type === 'game' || lastBotMessage?.type === 'software-list') && (lowerCaseText.includes('helpful guide') || lowerCaseText.includes('general step-by-step instructions'))) {
-                type = 'installation-guide';
-                platform = lastBotMessage.platform;
-            }
+        // Simplified logic based on the new, strict Output Contract
+        if (rawText.startsWith("Official download page:") || rawText.startsWith("The official page is unavailable.") || rawText.startsWith("I cannot help with that request.")) {
+            type = 'software'; // Treat all direct link responses as 'software' type for the UI
+        } else if (rawText.startsWith("Do you mean")) {
+            type = 'driver-input-prompt'; // Re-use for general clarification
+        } else if (rawText.startsWith("Official install video:") || rawText.startsWith("The video is unavailable.")) {
+            type = 'installation-guide';
         }
-        
-        // Clean up the text by removing any [TYPE] tag before sending it to the UI
-        const displayText = rawText.replace(/\[TYPE\]:\s*[\w-]+/, '').trim();
+
+        // Try to get platform context from the previous bot message if not explicit in the response
+        const lastBotMessageWithPlatform = [...history].reverse().find(m => m.sender === 'bot' && m.platform);
+        if (lastBotMessageWithPlatform) {
+            platform = lastBotMessageWithPlatform.platform;
+        }
+
+        // The new prompt doesn't use [TYPE] tags, so the old parsing logic is removed.
+        // The text is used as-is because it should match the Output Contract.
+        const displayText = rawText;
 
         return { text: displayText, groundingChunks, type, platform };
 
     } catch (error: any) {
         console.error("Error calling Gemini API:", error);
-
-        // Convert the entire error to a string to reliably check for rate limit messages.
         const errorString = JSON.stringify(error);
 
         if (errorString.includes('429') || errorString.includes('RESOURCE_EXHAUSTED')) {
