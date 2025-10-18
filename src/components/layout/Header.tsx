@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Session } from '../../types';
 import { supabase } from '../../services/supabase';
-import { CloseIcon, InformationIcon, FileIcon, SunIcon, MoonIcon } from '../ui/Icons';
+import { CloseIcon, InformationIcon, FileIcon, SunIcon, MoonIcon, AccessibilityIcon } from '../ui/Icons';
 
 interface HeaderProps {
     session: Session | null;
@@ -154,6 +154,14 @@ const Header: React.FC<HeaderProps> = ({ session, currentPage, onNavClick, onLog
                                     title="Download History"
                                 >
                                     <FileIcon className="h-5 w-5" />
+                                </button>
+                                
+                                <button
+                                    className="p-3 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-[#4F8A54]"
+                                    aria-label="Accessibility Options"
+                                    title="Accessibility Options"
+                                >
+                                    <AccessibilityIcon className="h-5 w-5" />
                                 </button>
 
                                 <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} />
