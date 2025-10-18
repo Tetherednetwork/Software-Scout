@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { DownloadHistoryItem } from '../../types';
-import { CloseIcon, DownloadIcon, HistoryIcon, SoftwareIcon, WrenchIcon, CheckCircleIcon, CloseCircleIcon } from '../ui/Icons';
+import { CloseIcon, DownloadIcon, HistoryIcon, SoftwareIcon, WrenchIcon, SuccessIcon, CloseCircleIcon } from '../ui/Icons';
 
 interface DownloadHistoryModalProps {
     history: DownloadHistoryItem[];
@@ -44,7 +44,7 @@ const DownloadHistoryModal: React.FC<DownloadHistoryModalProps> = ({ history, on
         if (status === 'verified') {
             return (
                 <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-medium bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full">
-                    <CheckCircleIcon className="h-4 w-4" />
+                    <SuccessIcon className="h-4 w-4" />
                     <span>Verified</span>
                 </div>
             );

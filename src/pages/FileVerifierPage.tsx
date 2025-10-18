@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { DocumentCheckIcon, CheckCircleIcon, CloseCircleIcon } from '../components/ui/Icons';
+import { DocumentCheckIcon, SuccessIcon, CloseCircleIcon } from '../components/ui/Icons';
 
 const FileVerifierPage: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
@@ -143,7 +143,7 @@ const FileVerifierPage: React.FC = () => {
                 {/* Verification Result */}
                 {status !== 'pending' && (
                     <div className={`p-4 rounded-lg flex items-center gap-4 ${isVerified ? 'bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-700' : ''} ${isFailed ? 'bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700' : ''}`}>
-                        {isVerified && <CheckCircleIcon className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0" />}
+                        {isVerified && <SuccessIcon className="h-8 w-8 text-green-600 dark:text-green-400 flex-shrink-0" />}
                         {isFailed && <CloseCircleIcon className="h-8 w-8 text-red-600 dark:text-red-400 flex-shrink-0" />}
                         <div>
                              <h3 className={`text-lg font-bold ${isVerified ? 'text-green-800 dark:text-green-200' : ''} ${isFailed ? 'text-red-800 dark:text-red-200' : ''}`}>

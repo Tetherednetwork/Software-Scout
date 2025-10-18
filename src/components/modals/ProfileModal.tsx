@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabase';
 import type { Session, UserDevice } from '../../types';
-import { CloseIcon, PlusIcon, LaptopIcon, PencilIcon, TrashIcon, CheckCircleIcon } from '../ui/Icons';
+import { CloseIcon, PlusIcon, LaptopIcon, PencilIcon, TrashIcon, SuccessIcon } from '../ui/Icons';
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -192,7 +192,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
                         
                         {successMessage && (
                             <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-lg text-sm flex items-center gap-2" role="alert">
-                                <CheckCircleIcon className="h-5 w-5" />
+                                <SuccessIcon className="h-5 w-5" />
                                 <span>{successMessage}</span>
                             </div>
                         )}
