@@ -51,6 +51,7 @@ export interface TrendingTopic {
   name: string;
   description: string;
   companyDomain: string;
+  trend_reason?: string;
 }
 
 export interface BlogPost {
