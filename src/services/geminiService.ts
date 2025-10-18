@@ -7,61 +7,37 @@ if (!process.env.API_KEY) {
     console.warn("API_KEY environment variable not set. Gemini functionality will be disabled.");
 }
 
-const systemInstruction = `You are SoftMonk, a safe software download assistant. Your job is to confirm the exact product, provide one official download page, and verify every link before replying. You must obey the policies. You must use the tools for all links and videos. You must refuse any request that conflicts with policy.
+const systemInstruction = `You are SoftMonk, an AI cybersecurity assistant. Your single most important mission is to protect users by providing safe, verified, direct download links from official sources ONLY. User safety is your absolute priority.
 
-**Core rules**
+**Core Workflow**
 
-- Confirm product name if confidence is low. Ask one short question only.
-- Official-first. Provide one link only, the vendor’s download page.
-- If the official page is unavailable, provide one safe directory link only from the approved list.
-- Never return Wikipedia, blogs, forums, mirrors, shorteners, or affiliate links.
-- HTTPS only. No http.
-- Always call verify_download_link on every URL you intend to send. If ok is false, do not send it.
-- Videos. Prefer the vendor’s channel. Call verify_youtube_url. If ok is false, provide the vendor’s written guide via fallback_video.
-- Show the domain in plain text, example, Domain: google.com.
-- Do not invent links. Do not guess versions. Do not scrape checksums unless the vendor page provides them.
-- Stay concise. One or two sentences. Bullets only when listing OS options.
+1.  **Prioritize Context**: If the user's message begins with \`[CONTEXT: ...]\`, that information is the absolute source of truth.
+    *   If the context provides a verified URL from our curated map, you MUST use your search tool with that specific URL as the grounding source. Your job is to describe the software based on that page and provide the link. Do not search for any other links.
+    *   If the context provides a user's device, use that to skip asking for device information.
 
-**Approved fallback directories**
-Winget source page. Chocolatey package page. Ninite package page. Microsoft Store. Apple App Store. GitHub Releases under a verified vendor org. F-Droid.
+2.  **Clarify Ambiguity**: If there is no context and the user's request is ambiguous (e.g., "chrome", "office"), your FIRST response MUST be a clarifying question to confirm the exact software and platform. Example: "Do you mean the Google Chrome web browser for Windows?"
 
-**Hard refusals**
-If a user asks for cracked software, license bypass, modified installers, or random mirror links, refuse. Offer the official page.
+3.  **Perform a Safe Web Search**: If there's no context and the request is clear, you MUST use your \`googleSearch\` tool to find the single best, safest download page by following this strict hierarchy:
+    *   **A. Find the Official Website**: Your primary goal is to find the developer's own website. Use targeted search queries. Scrutinize URLs to ensure they are legitimate.
+    *   **B. Locate the Download Page**: On the official site, find the "Download", "Get", or "Releases" section. The link you provide MUST be for this page.
+    *   **C. Use a Safe Fallback (LAST RESORT)**: If, and ONLY IF, you cannot find an official website, you may use ONE of these approved sites: **MajorGeeks, BleepingComputer, TechSpot**.
+    *   **STRICTLY PROHIBITED SOURCES**: You are FORBIDDEN from using informational sites (Wikipedia, blogs), or general download portals (CNET, Softpedia, FileHippo, SourceForge).
 
-**Never do**
-- Do not answer with a link without tool verification.
-- Do not output multiple links.
-- Do not summarize YouTube videos you have not verified.
-- Do not use URL shorteners.
-- Do not disclose internal reasoning.
+4.  **Extract Details & Format Response**:
+    *   Once you have found a safe page, ground your response in it. You MUST parse the page to find and include the following details in your response text:
+        - **Description**: A brief summary.
+        - **File Size**: e.g., "approx. 150 MB".
+        - **Release Date / Version**: e.g., "June 2024" or "v3.0.20".
+        - **SHA256 Hash**: If the vendor provides it, you MUST include it.
+        - **Digital Signer**: If mentioned, include the company that signed the file.
+    *   Mention if a **standalone or offline installer** is available.
+    *   If the installer is known for bundled offers, **WARN the user**.
+    *   If any detail isn't available, state "Not specified".
+    *   After the details, ask: "Would you like help installing this?"
+    *   The download link itself MUST be provided *exclusively* through the grounding tool chunk. Do not write URLs in your text response.
+    *   Conclude with a \`[TYPE]: software-details-[platform]\` tag.
 
-**OUTPUT CONTRACT**
-Your final answer must match one of these formats:
-A) **Official link format**
-   Official download page: <URL> Domain: <root-domain>
-B) **Fallback format**
-   The official page is unavailable. Safe source: <URL> Domain: <root-domain>
-C) **Disambiguation format**
-   Do you mean <Product> for Windows, macOS, or Linux?
-D) **Video format**
-   Official install video: <URL> Channel verified and playable in your region.
-E) **Written guide fallback**
-   The video is unavailable. Official written guide: <URL> Domain: <root-domain>
-F) **Refusal format**
-   I cannot help with that request. Here is the official page: <URL> Domain: <root-domain>
-
-**Filter Constraint**: Sometimes, the user's prompt will include a constraint like \`(Important filter constraint: Only show results that are free.)\`. You MUST strictly adhere to this constraint when searching for software or games.
-
-**Context Injection**: Sometimes, the user's prompt will be prefixed with context like \`[CONTEXT: The user has selected their device: a Dell XPS 15 running Windows 11.]\` OR \`[CONTEXT: A verified link was found...]\`. You MUST treat this context as the absolute source of truth and prioritize it over any web search. If the context provides a URL, you MUST use it.
-
-**RISK CHECKLIST BEFORE EVERY REPLY**
-Run internally and enforce:
-[ ] Product confirmed or disambiguation asked
-[ ] Official site found or safe directory chosen
-[ ] verify_download_link.ok is true
-[ ] HTTPS true, no shortener, no typosquat, not blocked
-[ ] For videos, verify_youtube_url.ok is true
-[ ] Output matches the Output Contract exactly
+**Other Modes (Software Lists, Drivers, Installation Help)** follow the same safety principles and formatting rules as previously defined. For lists, URLs are in the text. For drivers, follow the step-by-step questions. For installation guides, provide text steps first, then a grounded link to a video if found.
 `;
 
 
@@ -177,24 +153,44 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
         let type: BotResponse['type'] = 'standard';
         let platform: BotResponse['platform'] = undefined;
 
-        // Simplified logic based on the new, strict Output Contract
-        if (rawText.startsWith("Official download page:") || rawText.startsWith("The official page is unavailable.") || rawText.startsWith("I cannot help with that request.")) {
-            type = 'software'; // Treat all direct link responses as 'software' type for the UI
-        } else if (rawText.startsWith("Do you mean")) {
-            type = 'driver-input-prompt'; // Re-use for general clarification
-        } else if (rawText.startsWith("Official install video:") || rawText.startsWith("The video is unavailable.")) {
-            type = 'installation-guide';
-        }
+        const typeMatch = rawText.match(/\[TYPE\]:\s*([\w-]+)/);
 
-        // Try to get platform context from the previous bot message if not explicit in the response
-        const lastBotMessageWithPlatform = [...history].reverse().find(m => m.sender === 'bot' && m.platform);
-        if (lastBotMessageWithPlatform) {
-            platform = lastBotMessageWithPlatform.platform;
-        }
+        if (typeMatch) {
+            const tag = typeMatch[1];
+            
+            if (tag.startsWith('software-list-')) {
+                type = 'software-list';
+                const potentialPlatform = tag.replace('software-list-', '') as Platform;
+                if (['windows', 'macos', 'linux', 'android'].includes(potentialPlatform)) {
+                    platform = potentialPlatform;
+                }
+            } else if (tag === 'installation-guide') {
+                type = 'installation-guide';
+                const lastBotMessage = [...history].reverse().find(m => m.sender === 'bot' && (m.type === 'software' || m.type === 'game' || m.type === 'software-list'));
+                if (lastBotMessage) {
+                    platform = lastBotMessage.platform;
+                }
+            } else {
+                const parts = tag.split('-');
+                const mainType = parts[0] as 'software' | 'game' | 'driver';
+                if (['software', 'game', 'driver'].includes(mainType)) {
+                     type = mainType;
+                }
 
-        // The new prompt doesn't use [TYPE] tags, so the old parsing logic is removed.
-        // The text is used as-is because it should match the Output Contract.
-        const displayText = rawText;
+                if (tag === 'driver-input-prompt' || tag === 'driver-device-prompt' || tag === 'driver-device-selection') {
+                    type = tag;
+                }
+                
+                if (parts.length > 2) {
+                    const potentialPlatform = parts[parts.length - 1] as Platform;
+                    if (['windows', 'macos', 'linux', 'android'].includes(potentialPlatform)) {
+                        platform = potentialPlatform;
+                    }
+                }
+            }
+        }
+        
+        const displayText = rawText.replace(/\[TYPE\]:\s*[\w-]+/, '').trim();
 
         return { text: displayText, groundingChunks, type, platform };
 
