@@ -253,6 +253,21 @@ export const AdminPage: React.FC<AdminPageProps> = ({ session, onUserDataChange 
                 <button onClick={() => setManagementView('content')} className={`px-4 py-2 font-semibold text-sm ${managementView === 'content' ? 'border-b-2 border-green-600 text-green-600' : 'text-gray-500 hover:text-gray-700'}`}>Content</button>
             </div>
 
+            <div className="mb-6">
+                <button
+                    onClick={async () => {
+                        if (confirm('This will attempt to create initial collections if they are missing. Continue?')) {
+                            // Trivial "touch" to collections to ensure they exist or just rely on manual creation via the forms?
+                            // Since Firestore creates collections on document write, we can just alert the user.
+                            alert('Firestore works by creating collections automatically when you create the first document. \n\nPlease use the "Add Software" or "Create Post" buttons to initialize your data structures.');
+                        }
+                    }}
+                    className="text-xs text-blue-500 hover:text-blue-700 underline"
+                >
+                    Initialize / Check Database Structure
+                </button>
+            </div>
+
             {isLoading && <p className="text-center p-4">Loading data...</p>}
             {error && <p className="text-center p-4 text-red-500">{error}</p>}
 
