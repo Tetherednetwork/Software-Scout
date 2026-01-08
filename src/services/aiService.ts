@@ -13,7 +13,7 @@ export interface BotResponse {
 }
 
 /**
- * A central function to call our secure backend AI service (a Supabase Edge Function).
+ * A central function to call our secure backend AI service (a Firebase Cloud Function).
  * It includes client-side pre-processing to improve UX, such as handling saved devices and clarifying software.
  *
  * @param history - The current chat history.
