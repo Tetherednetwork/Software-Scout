@@ -158,18 +158,37 @@ export const findSoftware = async (
     }
     // --- END: Client-side pre-processing logic ---
 
+    // F. Resilience: Input Validation
+    if (!historyCopy || historyCopy.length === 0) {
+        console.warn("findSoftware called with empty history");
+        return { text: "I didn't catch that. Could you say it again?", type: 'standard' };
+    }
+
     try {
         const openaiChat = httpsCallable(functions, 'openai_chat');
         const { data } = await openaiChat({ history: historyCopy, filter });
 
-
+        if (!data) {
+            throw new Error("Empty response from AI service");
+        }
 
         return data as BotResponse;
 
     } catch (error: any) {
-        console.error("Unexpected client-side error in aiService:", error);
+        console.error("AI Service Error:", error);
+
+        // Resilience: Friendly Error Fallback
+        // Check for specific Firebase error codes if possible, or network/timeout issues.
+        let friendlyMessage = "I'm having a little trouble connecting to my brain right now. Please give me a moment and try again.";
+
+        if (error.code === 'functions/unavailable' || error.message.includes('network')) {
+            friendlyMessage = "I'm having trouble connecting to the internet. Please check your connection.";
+        } else if (error.code === 'functions/internal') {
+            friendlyMessage = "I encountered an internal glitch. I'm retrying my systems. Please ask me again.";
+        }
+
         return {
-            text: "An unexpected client-side error occurred. Please check the developer console.",
+            text: friendlyMessage,
             type: 'standard'
         };
     }

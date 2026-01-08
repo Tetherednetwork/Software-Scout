@@ -8,7 +8,8 @@ import {
   doc,
   getDoc,
   updateDoc,
-  getCountFromServer
+  getCountFromServer,
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Notification } from '../types';
@@ -145,4 +146,86 @@ export async function markNotificationsAsRead(userId: string): Promise<void> {
     console.error('Detailed error marking notifications as read:', error);
     throw new Error(`Database error: ${error.message}`);
   }
+}
+
+/**
+ * Subscribes to real-time notification updates.
+ * This is the preferred method for the UI to get live alerts.
+ */
+export function subscribeToNotifications(userId: string, onUpdate: (notifications: Notification[]) => void): () => void {
+  // We'll focus on personal notifications for real-time alerts to keep it efficient.
+  // Broadcasts can be fetched or we can create a composite subscription if needed,
+  // but for now, let's prioritize personal alerts.
+  const q = query(
+    collection(db, 'notifications'),
+    where('recipient_user_id', '==', userId),
+    orderBy('created_at', 'desc'),
+    limit(20)
+  );
+
+  return onSnapshot(q, async (snapshot) => {
+    const rawNotifications: any[] = [];
+    const actorIds = new Set<string>();
+
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      rawNotifications.push({ id: doc.id, ...data });
+      if (data.actor_user_id) actorIds.add(data.actor_user_id);
+    });
+
+    // Fetch actor profiles (we don't get these in snapshot automatically)
+    // Minimization: In a real app we might cache these profiles or embed them.
+    // Here we'll do a quick fetch. It might cause a slight delay in the callback, 
+    // but ensures data integrity.
+    const profilesMap = new Map<string, any>();
+    if (actorIds.size > 0) {
+      // We can't use await comfortably inside the synchronous snapshot handler 
+      // without handling the promise chain carefully.
+      // We'll fire off the fetches and call the callback when done.
+      Promise.all(Array.from(actorIds).map(uid => getUserProfile(uid).then(p => ({ uid, p }))))
+        .then(results => {
+          results.forEach(({ uid, p }) => {
+            if (p) profilesMap.set(uid, p);
+          });
+
+          const processedNotifications = rawNotifications.map(n => {
+            const actor = n.actor_user_id ? profilesMap.get(n.actor_user_id) : null;
+            return {
+              ...n,
+              actor: actor ? {
+                username: actor.username || 'A user',
+                avatar_url: actor.custom_avatar_url || actor.avatar_url || '/images/logo.png',
+              } : null
+            };
+          });
+          onUpdate(processedNotifications);
+        });
+    } else {
+      onUpdate(rawNotifications);
+    }
+  }, (error) => {
+    console.error("Error in notification subscription:", error);
+  });
+}
+
+/**
+ * Subscribes to the unread count in real-time.
+ */
+export function subscribeToUnreadCount(userId: string, onUpdate: (count: number) => void): () => void {
+  const q = query(
+    collection(db, 'notifications'),
+    where('recipient_user_id', '==', userId),
+    where('is_read', '==', false)
+  );
+
+  // Using onSnapshot for query count is only supported in newer SDKs via a specific API or by just counting docs.
+  // Since we limit fetch size elsewhere but here we want total count, let's just count the docs in the snapshot.
+  // Note: If a user has 1000 unread notifications, this reads 1000 docs. 
+  // Ideally we'd use aggregateField if available, or keep a counter on the user object.
+  // For this size of app, reading the docs is acceptable (unread queue shouldn't be huge).
+  return onSnapshot(q, (snapshot) => {
+    onUpdate(snapshot.size);
+  }, (error) => {
+    console.error("Error in unread count subscription:", error);
+  });
 }
