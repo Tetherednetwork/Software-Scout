@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      // Basic role check based on user profile. 
+      // Note: Ideally use Custom Claims for security, but this reads from the document for now.
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'system_engineer';
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow read: if isAuthenticated(); // Users can read other profiles (for avatars/names)
+      allow create: if isOwner(userId); // Users can create their own profile on signup
+      allow update: if isOwner(userId); // Users can update their own profile
+      allow delete: if false; // Only admins or soft-delete
+      
+      // Sub-collections
+      match /download_history/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      match /devices/{deviceId} {
+         allow read, write: if isOwner(userId);
+      }
+    }
+
+    // --- Forum ---
+    match /forum_posts/{postId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    match /forum_comments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+    
+    match /forum_likes/{likeId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.user_id == request.auth.uid;
+    }
+
+    // --- Notifications ---
+    // Notifications are protected. User can see their own, OR if it is a broadcast message.
+    match /notifications/{notificationId} {
+       allow read: if isAuthenticated() && (
+         resource.data.recipient_user_id == request.auth.uid || 
+         resource.data.is_broadcast == true
+       );
+       allow create: if isAuthenticated(); // allow creation mainly for system or background triggers
+       allow update: if isAuthenticated() && resource.data.recipient_user_id == request.auth.uid; // verify read status update
+       allow delete: if isAuthenticated() && resource.data.recipient_user_id == request.auth.uid;
+    }
+
+    // --- Blogs ---
+    match /blog_posts/{blogId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /blog_comments/{commentId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+    
+    match /blog_likes/{likeId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.user_id == request.auth.uid;
+    }
+
+    // --- Banners ---
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- Testimonials ---
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    // --- Feedback ---
+    match /feedbacks/{feedbackId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    
+    // --- Vendor Map ---
+    match /vendor_map_markers/{markerId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        // Allow update/delete if owner or admin
+        allow update, delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+  }
+}

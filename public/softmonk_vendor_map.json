@@ -1,0 +1,717 @@
+
+[
+  {
+    "name": "7-Zip",
+    "slug": "7-zip",
+    "homepage": "https://www.7-zip.org/",
+    "windows": "https://www.7-zip.org/download.html",
+    "mac": null,
+    "linux": "https://www.7-zip.org/download.html"
+  },
+  {
+    "name": "Adobe Acrobat Reader",
+    "slug": "adobe-acrobat-reader",
+    "homepage": "https://get.adobe.com/reader/",
+    "windows": "https://get.adobe.com/reader/",
+    "mac": "https://get.adobe.com/reader/"
+  },
+  {
+    "name": "Android Studio",
+    "slug": "android-studio",
+    "homepage": "https://developer.android.com/studio",
+    "windows": "https://developer.android.com/studio",
+    "mac": "https://developer.android.com/studio",
+    "linux": "https://developer.android.com/studio"
+  },
+  {
+    "name": "Asana",
+    "slug": "asana",
+    "homepage": "https://asana.com/apps",
+    "windows": "https://asana.com/apps",
+    "mac": "https://asana.com/apps"
+  },
+  {
+    "name": "Atom",
+    "slug": "atom",
+    "homepage": "https://github.com/atom/atom",
+    "windows": "https://github.com/atom/atom/releases/latest",
+    "mac": "https://github.com/atom/atom/releases/latest",
+    "linux": "https://github.com/atom/atom/releases/latest"
+  },
+  {
+    "name": "Audacity",
+    "slug": "audacity",
+    "homepage": "https://www.audacityteam.org/",
+    "windows": "https://www.audacityteam.org/download/windows/",
+    "mac": "https://www.audacityteam.org/download/mac/",
+    "linux": "https://www.audacityteam.org/download/linux/"
+  },
+  {
+    "name": "AutoHotkey",
+    "slug": "autohotkey",
+    "homepage": "https://www.autohotkey.com/",
+    "windows": "https://www.autohotkey.com/download/",
+    "mac": null
+  },
+  {
+    "name": "balenaEtcher",
+    "slug": "balenaetcher",
+    "homepage": "https://etcher.balena.io/",
+    "windows": "https://etcher.balena.io/",
+    "mac": "https://etcher.balena.io/",
+    "linux": "https://etcher.balena.io/"
+  },
+  {
+    "name": "Battle.net",
+    "slug": "battle-net",
+    "homepage": "https://www.blizzard.com/en-us/apps/battle.net/desktop",
+    "windows": "https://www.blizzard.com/en-us/apps/battle.net/desktop",
+    "mac": "https://www.blizzard.com/en-us/apps/battle.net/desktop"
+  },
+  {
+    "name": "Bitwarden",
+    "slug": "bitwarden",
+    "homepage": "https://bitwarden.com/",
+    "windows": "https://bitwarden.com/download/",
+    "mac": "https://bitwarden.com/download/",
+    "linux": "https://bitwarden.com/download/"
+  },
+  {
+    "name": "Blender",
+    "slug": "blender",
+    "homepage": "https://www.blender.org/",
+    "windows": "https://www.blender.org/download/",
+    "mac": "https://www.blender.org/download/",
+    "linux": "https://www.blender.org/download/"
+  },
+  {
+    "name": "Brave Browser",
+    "slug": "brave-browser",
+    "homepage": "https://brave.com/",
+    "windows": "https://brave.com/download/",
+    "mac": "https://brave.com/download/",
+    "linux": "https://brave.com/linux/"
+  },
+  {
+    "name": "Calibre",
+    "slug": "calibre",
+    "homepage": "https://calibre-ebook.com/",
+    "windows": "https://calibre-ebook.com/download_windows",
+    "mac": "https://calibre-ebook.com/download_osx",
+    "linux": "https://calibre-ebook.com/download_linux"
+  },
+  {
+    "name": "Canva",
+    "slug": "canva",
+    "homepage": "https://www.canva.com/",
+    "windows": "https://www.canva.com/download/windows/",
+    "mac": "https://www.canva.com/download/mac/"
+  },
+  {
+    "name": "CCleaner",
+    "slug": "ccleaner",
+    "homepage": "https://www.ccleaner.com/",
+    "windows": "https://www.ccleaner.com/ccleaner/download",
+    "mac": "https://www.ccleaner.com/ccleaner-mac/download"
+  },
+  {
+    "name": "DaVinci Resolve",
+    "slug": "davinci-resolve",
+    "homepage": "https://www.blackmagicdesign.com/products/davinciresolve/",
+    "windows": "https://www.blackmagicdesign.com/products/davinciresolve/",
+    "mac": "https://www.blackmagicdesign.com/products/davinciresolve/",
+    "linux": "https://www.blackmagicdesign.com/products/davinciresolve/"
+  },
+  {
+    "name": "Discord",
+    "slug": "discord",
+    "homepage": "https://discord.com/",
+    "windows": "https://discord.com/download",
+    "mac": "https://discord.com/download",
+    "linux": "https://discord.com/download",
+    "android": "https://play.google.com/store/apps/details?id=com.discord"
+  },
+  {
+    "name": "Docker Desktop",
+    "slug": "docker-desktop",
+    "homepage": "https://www.docker.com/products/docker-desktop/",
+    "windows": "https://www.docker.com/products/docker-desktop/",
+    "mac": "https://www.docker.com/products/docker-desktop/",
+    "linux": "https://docs.docker.com/desktop/install/linux-install/"
+  },
+  {
+    "name": "Dropbox",
+    "slug": "dropbox",
+    "homepage": "https://www.dropbox.com/",
+    "windows": "https://www.dropbox.com/install",
+    "mac": "https://www.dropbox.com/install",
+    "linux": "https://www.dropbox.com/install-linux"
+  },
+  {
+    "name": "EA App",
+    "slug": "ea-app",
+    "homepage": "https://www.ea.com/ea-app",
+    "windows": "https://www.ea.com/ea-app",
+    "mac": "https://www.ea.com/ea-app"
+  },
+  {
+    "name": "Epic Games Launcher",
+    "slug": "epic-games-launcher",
+    "homepage": "https://www.epicgames.com/store/",
+    "windows": "https://www.epicgames.com/store/en-US/download",
+    "mac": "https://www.epicgames.com/store/en-US/download"
+  },
+  {
+    "name": "Evernote",
+    "slug": "evernote",
+    "homepage": "https://evernote.com/",
+    "windows": "https://evernote.com/download",
+    "mac": "https://evernote.com/download"
+  },
+  {
+    "name": "Everything",
+    "slug": "everything-search",
+    "homepage": "https://www.voidtools.com/",
+    "windows": "https://www.voidtools.com/downloads/",
+    "mac": null,
+    "linux": null
+  },
+  {
+    "name": "f.lux",
+    "slug": "f-lux",
+    "homepage": "https://justgetflux.com/",
+    "windows": "https://justgetflux.com/",
+    "mac": "https://justgetflux.com/",
+    "linux": "https://justgetflux.com/linux.html"
+  },
+  {
+    "name": "Figma",
+    "slug": "figma",
+    "homepage": "https://www.figma.com/",
+    "windows": "https://www.figma.com/downloads/",
+    "mac": "https://www.figma.com/downloads/"
+  },
+  {
+    "name": "FileZilla",
+    "slug": "filezilla",
+    "homepage": "https://filezilla-project.org/",
+    "windows": "https://filezilla-project.org/download.php?type=client",
+    "mac": "https://filezilla-project.org/download.php?type=client",
+    "linux": "https://filezilla-project.org/download.php?type=client"
+  },
+  {
+    "name": "foobar2000",
+    "slug": "foobar2000",
+    "homepage": "https://www.foobar2000.org/",
+    "windows": "https://www.foobar2000.org/download",
+    "mac": null
+  },
+  {
+    "name": "GIMP",
+    "slug": "gimp",
+    "homepage": "https://www.gimp.org/",
+    "windows": "https://www.gimp.org/downloads/",
+    "mac": "https://www.gimp.org/downloads/",
+    "linux": "https://www.gimp.org/downloads/"
+  },
+  {
+    "name": "Git",
+    "slug": "git",
+    "homepage": "https://git-scm.com/",
+    "windows": "https://git-scm.com/download/win",
+    "mac": "https://git-scm.com/download/mac",
+    "linux": "https://git-scm.com/download/linux"
+  },
+  {
+    "name": "GitKraken",
+    "slug": "gitkraken",
+    "homepage": "https://www.gitkraken.com/",
+    "windows": "https://www.gitkraken.com/download",
+    "mac": "https://www.gitkraken.com/download",
+    "linux": "https://www.gitkraken.com/download"
+  },
+  {
+    "name": "GOG Galaxy",
+    "slug": "gog-galaxy",
+    "homepage": "https://www.gog.com/galaxy",
+    "windows": "https://www.gog.com/galaxy",
+    "mac": "https://www.gog.com/galaxy"
+  },
+  {
+    "name": "Google Chrome",
+    "slug": "google-chrome",
+    "homepage": "https://www.google.com/chrome/",
+    "windows": "https://www.google.com/chrome/",
+    "mac": "https://www.google.com/chrome/",
+    "linux": "https://www.google.com/chrome/",
+    "android": "https://play.google.com/store/apps/details?id=com.android.chrome"
+  },
+  {
+    "name": "Google Drive for desktop",
+    "slug": "google-drive-desktop",
+    "homepage": "https://www.google.com/drive/download/",
+    "windows": "https://www.google.com/drive/download/",
+    "mac": "https://www.google.com/drive/download/"
+  },
+  {
+    "name": "Greenshot",
+    "slug": "greenshot",
+    "homepage": "https://getgreenshot.org/",
+    "windows": "https://getgreenshot.org/downloads/",
+    "mac": "https://getgreenshot.org/downloads/"
+  },
+  {
+    "name": "HandBrake",
+    "slug": "handbrake",
+    "homepage": "https://handbrake.fr/",
+    "windows": "https://handbrake.fr/downloads.php",
+    "mac": "https://handbrake.fr/downloads.php",
+    "linux": "https://handbrake.fr/downloads.php"
+  },
+  {
+    "name": "Inkscape",
+    "slug": "inkscape",
+    "homepage": "https://inkscape.org/",
+    "windows": "https://inkscape.org/release/inkscape-1.3/",
+    "mac": "https://inkscape.org/release/inkscape-1.3/",
+    "linux": "https://inkscape.org/release/inkscape-1.3/"
+  },
+  {
+    "name": "IntelliJ IDEA Community Edition",
+    "slug": "intellij-idea-community",
+    "homepage": "https://www.jetbrains.com/idea/",
+    "windows": "https://www.jetbrains.com/idea/download/",
+    "mac": "https://www.jetbrains.com/idea/download/",
+    "linux": "https://www.jetbrains.com/idea/download/"
+  },
+  {
+    "name": "iTerm2",
+    "slug": "iterm2",
+    "homepage": "https://iterm2.com/",
+    "windows": null,
+    "mac": "https://iterm2.com/downloads.html"
+  },
+  {
+    "name": "Java JDK (Adoptium Temurin)",
+    "slug": "temurin-jdk",
+    "homepage": "https://adoptium.net/",
+    "windows": "https://adoptium.net/temurin/releases/",
+    "mac": "https://adoptium.net/temurin/releases/",
+    "linux": "https://adoptium.net/temurin/releases/"
+  },
+  {
+    "name": "Kdenlive",
+    "slug": "kdenlive",
+    "homepage": "https://kdenlive.org/",
+    "windows": "https://kdenlive.org/en/download/",
+    "mac": "https://kdenlive.org/en/download/",
+    "linux": "https://kdenlive.org/en/download/"
+  },
+  {
+    "name": "KeePassXC",
+    "slug": "keepassxc",
+    "homepage": "https://keepassxc.org/",
+    "windows": "https://keepassxc.org/download/",
+    "mac": "https://keepassxc.org/download/",
+    "linux": "https://keepassxc.org/download/"
+  },
+  {
+    "name": "Kodi",
+    "slug": "kodi",
+    "homepage": "https://kodi.tv/",
+    "windows": "https://kodi.tv/download/windows",
+    "mac": "https://kodi.tv/download/macos",
+    "linux": "https://kodi.tv/download/linux",
+    "android": "https://kodi.tv/download/android"
+  },
+  {
+    "name": "Krita",
+    "slug": "krita",
+    "homepage": "https://krita.org/",
+    "windows": "https://krita.org/en/download/krita-desktop/",
+    "mac": "https://krita.org/en/download/krita-desktop/",
+    "linux": "https://krita.org/en/download/krita-desktop/"
+  },
+  {
+    "name": "LastPass",
+    "slug": "lastpass",
+    "homepage": "https://www.lastpass.com",
+    "windows": "https://lastpass.com/misc_download2.php",
+    "mac": "https://lastpass.com/misc_download2.php",
+    "linux": "https://lastpass.com/misc_download2.php"
+  },
+  {
+    "name": "LibreOffice",
+    "slug": "libreoffice",
+    "homepage": "https://www.libreoffice.org/",
+    "windows": "https://www.libreoffice.org/download/download-libreoffice/",
+    "mac": "https://www.libreoffice.org/download/download-libreoffice/",
+    "linux": "https://www.libreoffice.org/download/download-libreoffice/"
+  },
+  {
+    "name": "Lightshot",
+    "slug": "lightshot",
+    "homepage": "https://app.prntscr.com/",
+    "windows": "https://app.prntscr.com/en/index.html",
+    "mac": "https://app.prntscr.com/en/index.html"
+  },
+  {
+    "name": "Malwarebytes",
+    "slug": "malwarebytes",
+    "homepage": "https://www.malwarebytes.com/",
+    "windows": "https://www.malwarebytes.com/mwb-download",
+    "mac": "https://www.malwarebytes.com/mac-download"
+  },
+  {
+    "name": "Microsoft Edge",
+    "slug": "microsoft-edge",
+    "homepage": "https://www.microsoft.com/edge",
+    "windows": "https://www.microsoft.com/edge/download",
+    "mac": "https://www.microsoft.com/edge/download",
+    "linux": "https://www.microsoft.com/edge/download"
+  },
+  {
+    "name": "Microsoft Office 365",
+    "slug": "microsoft-office-365",
+    "homepage": "https://www.microsoft.com/en-us/microsoft-365",
+    "windows": "https://www.microsoft.com/en-us/microsoft-365/try",
+    "mac": "https://www.microsoft.com/en-us/microsoft-365/try"
+  },
+  {
+    "name": "Microsoft Teams",
+    "slug": "microsoft-teams",
+    "homepage": "https://www.microsoft.com/microsoft-teams/",
+    "windows": "https://www.microsoft.com/microsoft-teams/download-app",
+    "mac": "https://www.microsoft.com/microsoft-teams/download-app"
+  },
+  {
+    "name": "Mozilla Firefox",
+    "slug": "mozilla-firefox",
+    "homepage": "https://www.mozilla.org/firefox/",
+    "windows": "https://www.mozilla.org/firefox/download/thanks/",
+    "mac": "https://www.mozilla.org/firefox/download/thanks/",
+    "linux": "https://www.mozilla.org/firefox/all/#product-desktop-release"
+  },
+  {
+    "name": "Node.js",
+    "slug": "nodejs",
+    "homepage": "https://nodejs.org/",
+    "windows": "https://nodejs.org/en/download/",
+    "mac": "https://nodejs.org/en/download/",
+    "linux": "https://nodejs.org/en/download/package-manager/"
+  },
+  {
+    "name": "Notepad++",
+    "slug": "notepad-plus-plus",
+    "homepage": "https://notepad-plus-plus.org/",
+    "windows": "https://notepad-plus-plus.org/downloads/",
+    "mac": null
+  },
+  {
+    "name": "Notion",
+    "slug": "notion",
+    "homepage": "https://www.notion.so/",
+    "windows": "https://www.notion.so/download",
+    "mac": "https://www.notion.so/download"
+  },
+  {
+    "name": "OBS Studio",
+    "slug": "obs-studio",
+    "homepage": "https://obsproject.com/",
+    "windows": "https://obsproject.com/download",
+    "mac": "https://obsproject.com/download",
+    "linux": "https://obsproject.com/download"
+  },
+  {
+    "name": "Obsidian",
+    "slug": "obsidian",
+    "homepage": "https://obsidian.md/",
+    "windows": "https://obsidian.md/download",
+    "mac": "https://obsidian.md/download",
+    "linux": "https://obsidian.md/download"
+  },
+  {
+    "name": "OneDrive",
+    "slug": "microsoft-onedrive",
+    "homepage": "https://www.microsoft.com/onedrive",
+    "windows": "https://www.microsoft.com/en-us/microsoft-365/onedrive/download",
+    "mac": "https://www.microsoft.com/en-us/microsoft-365/onedrive/download"
+  },
+  {
+    "name": "Opera",
+    "slug": "opera",
+    "homepage": "https://www.opera.com/",
+    "windows": "https://www.opera.com/download",
+    "mac": "https://www.opera.com/download",
+    "linux": "https://www.opera.com/download"
+  },
+  {
+    "name": "Paint.NET",
+    "slug": "paint-net",
+    "homepage": "https://www.getpaint.net/",
+    "windows": "https://www.getpaint.net/download.html",
+    "mac": null
+  },
+  {
+    "name": "Plex",
+    "slug": "plex",
+    "homepage": "https://www.plex.tv/",
+    "windows": "https://www.plex.tv/media-server-downloads/",
+    "mac": "https://www.plex.tv/media-server-downloads/",
+    "linux": "https://www.plex.tv/media-server-downloads/"
+  },
+  {
+    "name": "Postman",
+    "slug": "postman",
+    "homepage": "https://www.postman.com/",
+    "windows": "https://www.postman.com/downloads/",
+    "mac": "https://www.postman.com/downloads/",
+    "linux": "https://www.postman.com/downloads/"
+  },
+  {
+    "name": "PowerToys",
+    "slug": "powertoys",
+    "homepage": "https://github.com/microsoft/PowerToys",
+    "windows": "https://github.com/microsoft/PowerToys/releases/latest",
+    "mac": null
+  },
+  {
+    "name": "PuTTY",
+    "slug": "putty",
+    "homepage": "https://www.putty.org/",
+    "windows": "https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html",
+    "mac": null,
+    "linux": null
+  },
+  {
+    "name": "PyCharm Community Edition",
+    "slug": "pycharm-community",
+    "homepage": "https://www.jetbrains.com/pycharm/",
+    "windows": "https://www.jetbrains.com/pycharm/download/",
+    "mac": "https://www.jetbrains.com/pycharm/download/",
+    "linux": "https://www.jetbrains.com/pycharm/download/"
+  },
+  {
+    "name": "Python",
+    "slug": "python",
+    "homepage": "https://www.python.org/",
+    "windows": "https://www.python.org/downloads/windows/",
+    "mac": "https://www.python.org/downloads/macos/",
+    "linux": "https://www.python.org/downloads/source/"
+  },
+  {
+    "name": "Rufus",
+    "slug": "rufus",
+    "homepage": "https://rufus.ie/",
+    "windows": "https://rufus.ie/en/",
+    "mac": null
+  },
+  {
+    "name": "ShareX",
+    "slug": "sharex",
+    "homepage": "https://getsharex.com/",
+    "windows": "https://getsharex.com/downloads/",
+    "mac": null,
+    "linux": null
+  },
+  {
+    "name": "Signal Desktop",
+    "slug": "signal-desktop",
+    "homepage": "https://signal.org/",
+    "windows": "https://signal.org/download/",
+    "mac": "https://signal.org/download/",
+    "linux": "https://signal.org/download/"
+  },
+  {
+    "name": "Skype",
+    "slug": "skype",
+    "homepage": "https://www.skype.com/",
+    "windows": "https://www.skype.com/get-skype/",
+    "mac": "https://www.skype.com/get-skype/",
+    "linux": "https://www.skype.com/get-skype/"
+  },
+  {
+    "name": "Slack",
+    "slug": "slack",
+    "homepage": "https://slack.com/",
+    "windows": "https://slack.com/downloads/windows",
+    "mac": "https://slack.com/downloads/mac",
+    "linux": "https://slack.com/downloads/linux"
+  },
+  {
+    "name": "Sourcetree",
+    "slug": "sourcetree",
+    "homepage": "https://www.sourcetreeapp.com/",
+    "windows": "https://www.sourcetreeapp.com/",
+    "mac": "https://www.sourcetreeapp.com/"
+  },
+  {
+    "name": "Spotify",
+    "slug": "spotify",
+    "homepage": "https://www.spotify.com/",
+    "windows": "https://www.spotify.com/us/download/windows/",
+    "mac": "https://www.spotify.com/us/download/mac/"
+  },
+  {
+    "name": "Steam",
+    "slug": "steam",
+    "homepage": "https://store.steampowered.com/",
+    "windows": "https://store.steampowered.com/about/",
+    "mac": "https://store.steampowered.com/about/"
+  },
+  {
+    "name": "Sublime Text",
+    "slug": "sublime-text",
+    "homepage": "https://www.sublimetext.com/",
+    "windows": "https://www.sublimetext.com/download",
+    "mac": "https://www.sublimetext.com/download",
+    "linux": "https://www.sublimetext.com/download"
+  },
+  {
+    "name": "Syncthing",
+    "slug": "syncthing",
+    "homepage": "https://syncthing.net/",
+    "windows": "https://syncthing.net/downloads/",
+    "mac": "https://syncthing.net/downloads/",
+    "linux": "https://syncthing.net/downloads/"
+  },
+  {
+    "name": "Telegram Desktop",
+    "slug": "telegram-desktop",
+    "homepage": "https://desktop.telegram.org/",
+    "windows": "https://desktop.telegram.org/",
+    "mac": "https://macos.telegram.org/",
+    "linux": "https://desktop.telegram.org/"
+  },
+  {
+    "name": "Termius",
+    "slug": "termius",
+    "homepage": "https://termius.com/",
+    "windows": "https://termius.com/download/windows",
+    "mac": "https://termius.com/download/mac",
+    "linux": "https://termius.com/download/linux"
+  },
+  {
+    "name": "Todoist",
+    "slug": "todoist",
+    "homepage": "https://todoist.com/",
+    "windows": "https://todoist.com/downloads/windows",
+    "mac": "https://todoist.com/downloads/mac",
+    "linux": "https://todoist.com/downloads/linux"
+  },
+  {
+    "name": "Trello",
+    "slug": "trello",
+    "homepage": "https://trello.com/",
+    "windows": "https://trello.com/platforms",
+    "mac": "https://trello.com/platforms"
+  },
+  {
+    "name": "TreeSize Free",
+    "slug": "treesize-free",
+    "homepage": "https://www.jam-software.com/treesize_free",
+    "windows": "https://www.jam-software.com/treesize_free",
+    "mac": null
+  },
+  {
+    "name": "VirtualBox",
+    "slug": "virtualbox",
+    "homepage": "https://www.virtualbox.org/",
+    "windows": "https://www.virtualbox.org/wiki/Downloads",
+    "mac": "https://www.virtualbox.org/wiki/Downloads",
+    "linux": "https://www.virtualbox.org/wiki/Downloads"
+  },
+  {
+    "name": "Visual Studio",
+    "slug": "visual-studio",
+    "homepage": "https://visualstudio.microsoft.com/",
+    "windows": "https://visualstudio.microsoft.com/downloads/",
+    "mac": "https://visualstudio.microsoft.com/vs/mac/",
+    "linux": null
+  },
+  {
+    "name": "Visual Studio Code",
+    "slug": "visual-studio-code",
+    "homepage": "https://code.visualstudio.com/",
+    "windows": "https://code.visualstudio.com/Download",
+    "mac": "https://code.visualstudio.com/Download",
+    "linux": "https://code.visualstudio.com/Download"
+  },
+  {
+    "name": "Vivaldi",
+    "slug": "vivaldi",
+    "homepage": "https://vivaldi.com/",
+    "windows": "https://vivaldi.com/download/",
+    "mac": "https://vivaldi.com/download/",
+    "linux": "https://vivaldi.com/download/"
+  },
+  {
+    "name": "VLC media player",
+    "slug": "vlc",
+    "homepage": "https://www.videolan.org/vlc/",
+    "windows": "https://www.videolan.org/vlc/",
+    "mac": "https://www.videolan.org/vlc/",
+    "linux": "https://www.videolan.org/vlc/",
+    "android": "https://play.google.com/store/apps/details?id=org.videolan.vlc"
+  },
+  {
+    "name": "VMware Workstation Player",
+    "slug": "vmware-workstation-player",
+    "homepage": "https://www.vmware.com/products/workstation-player.html",
+    "windows": "https://www.vmware.com/go/getplayer-win",
+    "mac": null,
+    "linux": "https://www.vmware.com/go/getplayer-linux"
+  },
+  {
+    "name": "WebStorm",
+    "slug": "webstorm",
+    "homepage": "https://www.jetbrains.com/webstorm/",
+    "windows": "https://www.jetbrains.com/webstorm/download/",
+    "mac": "https://www.jetbrains.com/webstorm/download/",
+    "linux": "https://www.jetbrains.com/webstorm/download/"
+  },
+  {
+    "name": "WhatsApp Desktop",
+    "slug": "whatsapp-desktop",
+    "homepage": "https://www.whatsapp.com/",
+    "windows": "https://www.whatsapp.com/download",
+    "mac": "https://www.whatsapp.com/download"
+  },
+  {
+    "name": "Winamp",
+    "slug": "winamp",
+    "homepage": "https://www.winamp.com/",
+    "windows": "https://www.winamp.com/downloads/",
+    "mac": null
+  },
+  {
+    "name": "Windows Terminal",
+    "slug": "windows-terminal",
+    "homepage": "https://github.com/microsoft/terminal",
+    "windows": "https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701",
+    "mac": null
+  },
+  {
+    "name": "WinRAR",
+    "slug": "winrar",
+    "homepage": "https://www.rarlab.com/",
+    "windows": "https://www.rarlab.com/download.htm",
+    "mac": "https://www.rarlab.com/download.htm",
+    "linux": "https://www.rarlab.com/download.htm"
+  },
+  {
+    "name": "WinSCP",
+    "slug": "winscp",
+    "homepage": "https://winscp.net/",
+    "windows": "https://winscp.net/eng/download.php",
+    "mac": null
+  },
+  {
+    "name": "Zoom",
+    "slug": "zoom",
+    "homepage": "https://zoom.us/",
+    "windows": "https://zoom.us/download",
+    "mac": "https://zoom.us/download",
+    "linux": "https://zoom.us/download"
+  }
+]

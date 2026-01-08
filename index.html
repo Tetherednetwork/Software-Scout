@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>SoftMonk: Your AI Guide to Safe Software, Games & Drivers</title>
+    <meta name="description" content="Find and install any software or game with confidence. SoftMonk is your cross-platform AI assistant for safe, verified download links from official sources, step-by-step installation guides, and the right drivers for your PC." />
+    <meta name="keywords" content="safe software download, verified drivers, official download links, malware free software, softmonk, ai software finder" />
+    <link rel="canonical" href="https://softmonk.co" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://softmonk.co/" />
+    <meta property="og:title" content="SoftMonk: Your AI Guide to Safe Software, Games & Drivers" />
+    <meta property="og:description" content="Find safe, verified download links from official sources, step-by-step installation guides, and the right drivers for your PC. Avoid malware and bundleware with your AI guide." />
+    <meta property="og:image" content="https://softmonk.co/images/SoftMonk_logo_2.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://softmonk.co/" />
+    <meta property="twitter:title" content="SoftMonk: Your AI Guide to Safe Software, Games & Drivers" />
+    <meta property="twitter:description" content="Find safe, verified download links from official sources, step-by-step installation guides, and the right drivers for your PC. Avoid malware and bundleware with your AI guide." />
+    <meta property="twitter:image" content="https://softmonk.co/images/SoftMonk_logo_2.png" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SoftMonk",
+      "url": "https://softmonk.co",
+      "logo": "https://softmonk.co/images/logo22.png",
+      "sameAs": []
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SoftMonk",
+      "url": "https://softmonk.co",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://softmonk.co/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --font-sans: 'Inter', sans-serif;
+        --font-display: 'Poppins', sans-serif;
+        --color-primary-dark: #2A482E;
+        --color-primary-light: #355E3B;
+        --color-accent: #FBBF24; /* Tailwind amber-400 */
+        --color-accent-hover: #F59E0B; /* Tailwind amber-500 */
+        
+        --bg-dark-zen: #1A241B; /* Deep Forest */
+
+        --rounded-soft: 1.25rem; /* 20px */
+        --shadow-soft: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+      }
+
+      /* Base Typography & Theme Application */
+      body {
+        font-family: var(--font-sans);
+        background-color: #F9FAFB;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+      }
+
+      /* Dark Mode Background */
+      html.dark body {
+        background-color: var(--bg-dark-zen);
+      }
+      
+      /* Primary Gradient Utility */
+      .bg-primary-gradient {
+        background-image: linear-gradient(to right, var(--color-primary-dark), var(--color-primary-light));
+      }
+
+      /* Softer corners and shadows override */
+      .rounded-2xl {
+        border-radius: var(--rounded-soft);
+      }
+      .shadow-2xl {
+        box-shadow: var(--shadow-soft);
+      }
+      .shadow-lg {
+          box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+      }
+
+      /* Enhanced Glassmorphism */
+      .bg-white\/80 {
+        background-color: rgba(255, 255, 255, 0.6);
+      }
+      .dark .dark\:bg-gray-800\/80 {
+          background-color: rgba(26, 36, 27, 0.5); /* Green-tinted transparent dark */
+      }
+
+      /* Nav Link Accent */
+      .nav-link-hover::after {
+        background-color: var(--color-accent-hover) !important;
+      }
+      html.dark .nav-link-hover::after {
+          background-color: var(--color-accent) !important;
+      }
+    </style>
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #root {
+        position: relative;
+        z-index: 1;
+      }
+      .marquee-mask {
+        mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+      }
+      .marquee-content {
+        animation: scroll-up 36s linear infinite;
+      }
+      @keyframes scroll-up {
+        from {
+          transform: translateY(0%);
+        }
+        to {
+          transform: translateY(-50%);
+        }
+      }
+      .avatar-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      /* Background Effects */
+      #background-effects {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      
+      #grid-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        --grid-color-light: rgba(0, 0, 0, 0.04);
+        --grid-color-dark: rgba(255, 255, 255, 0.04);
+        --grid-color: var(--grid-color-light);
+        background-image:
+          linear-gradient(var(--grid-color) 1px, transparent 1px),
+          linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+        background-size: 40px 40px;
+        animation: pan-grid 120s linear infinite;
+      }
+
+      html.dark #grid-background {
+        --grid-color: var(--grid-color-dark);
+      }
+      
+      @keyframes pan-grid {
+        0% { background-position: 0px 0px; }
+        100% { background-position: 240px 240px; }
+      }
+
+      .ripple {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        --ripple-color-light: rgba(144, 238, 144, 0.4);
+        --ripple-color-dark: rgba(17, 94, 89, 0.4);
+        --ripple-color: var(--ripple-color-light);
+        border: 2px solid var(--ripple-color);
+        transform-origin: center;
+        animation: ripple-effect 6s ease-out infinite;
+        opacity: 1;
+      }
+      
+      html.dark .ripple {
+        --ripple-color: var(--ripple-color-dark);
+      }
+
+      .ripple:nth-child(2) {
+        animation-delay: 2s;
+      }
+
+      .ripple:nth-child(3) {
+        animation-delay: 4s;
+      }
+
+      @keyframes ripple-effect {
+        from {
+          transform: scale(0);
+          opacity: 1;
+        }
+        to {
+          transform: scale(300);
+          opacity: 0;
+        }
+      }
+      
+      .top-bar-text-animated {
+        animation: slide-in-up 0.5s ease-out forwards;
+      }
+
+      @keyframes slide-in-up {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Post Highlight Animation */
+      @keyframes highlight-post-anim {
+        from {
+          box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.7); /* amber-400 with opacity */
+        }
+        to {
+          box-shadow: 0 0 0 4px rgba(251, 191, 36, 0);
+        }
+      }
+      .highlight-post {
+        animation: highlight-post-anim 2s ease-out;
+      }
+
+      /* Onboarding Tour Styles */
+      .tour-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 9998;
+      }
+      .tour-highlight {
+        position: relative;
+        z-index: 9999;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease-in-out;
+      }
+      .tour-tooltip {
+        position: absolute;
+        z-index: 10000;
+        background-color: white;
+        color: #1f2937;
+        padding: 16px;
+        border-radius: 12px;
+        width: 320px;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        border: 1px solid #e5e7eb;
+      }
+      html.dark .tour-tooltip {
+        background-color: #374151; /* gray-700 */
+        color: #f3f4f6; /* gray-100 */
+        border-color: #4b5563; /* gray-600 */
+      }
+      .tour-tooltip-arrow {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
+      .tour-tooltip-arrow.bottom {
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 8px 8px 0 8px;
+        border-color: white transparent transparent transparent;
+      }
+      html.dark .tour-tooltip-arrow.bottom {
+        border-color: #374151 transparent transparent transparent;
+      }
+      .tour-tooltip-arrow.top {
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 0 8px 8px 8px;
+        border-color: transparent transparent white transparent;
+      }
+      html.dark .tour-tooltip-arrow.top {
+        border-color: transparent transparent #374151 transparent;
+      }
+      .tour-tooltip-arrow.left {
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        border-width: 8px 0 8px 8px;
+        border-color: transparent transparent transparent white;
+      }
+      html.dark .tour-tooltip-arrow.left {
+        border-color: transparent transparent transparent #374151;
+      }
+      .tour-tooltip-arrow.right {
+        top: 50%;
+        right: 100%;
+        transform: translateY(-50%);
+        border-width: 8px 8px 8px 0;
+        border-color: transparent white transparent transparent;
+      }
+      html.dark .tour-tooltip-arrow.right {
+        border-color: transparent #374151 transparent transparent;
+      }
+
+      /* Responsive Video Embeds */
+      .aspect-w-16 {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      }
+      .aspect-w-16 > iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+
+      /* Screen-reader only utility class */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      /* Nav link hover effect */
+      .nav-link-hover::after {
+          content: '';
+          position: absolute;
+          bottom: 6px; /* Positioned within the bottom padding */
+          left: 1rem; /* Corresponds to px-4 */
+          right: 1rem; /* Corresponds to px-4 */
+          height: 3px;
+          background-color: #355E3B;
+          transform: scaleX(0);
+          transform-origin: center;
+          transition: transform 0.25s ease-out;
+      }
+
+      .nav-link-hover:hover::after,
+      .nav-link-active.nav-link-hover::after {
+          transform: scaleX(1);
+          background-color: var(--color-accent) !important;
+      }
+      
+      /* Testimonial Slider */
+      .testimonial-slider-inner {
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .testimonial-dot.active {
+        background-color: var(--color-primary-light);
+        width: 1.5rem;
+      }
+      html.dark .testimonial-dot.active {
+        background-color: var(--color-accent);
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.58.0",
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "process": "https://aistudiocdn.com/process@^0.11.10",
+    "vite": "https://aistudiocdn.com/vite@^7.1.12",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "url": "https://aistudiocdn.com/url@^0.11.4",
+    "fs": "https://aistudiocdn.com/fs@^0.0.1-security"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="background-effects" aria-hidden="true">
+      <div id="grid-background"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

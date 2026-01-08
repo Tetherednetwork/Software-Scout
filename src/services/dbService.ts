@@ -1,0 +1,159 @@
+import {
+    collection,
+    doc,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    limit
+} from 'firebase/firestore';
+import { db } from './firebase';
+import type { UserDevice, DownloadHistoryItem } from '../types';
+
+export const dbService = {
+    // --- Devices ---
+    getUserDevices: async (userId: string) => {
+        try {
+            const q = query(collection(db, 'users', userId, 'devices'), orderBy('created_at', 'desc'));
+            const querySnapshot = await getDocs(q);
+            const devices: UserDevice[] = [];
+            querySnapshot.forEach((doc) => {
+                devices.push({ id: doc.id, ...doc.data() } as any); // Type assertion needed or clean mapping
+            });
+            return { data: devices, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    addDevice: async (userId: string, device: Omit<UserDevice, 'id' | 'created_at' | 'user_id'>) => {
+        try {
+            // Check for duplicate name logic if needed (optional for MVP)
+            const docRef = await addDoc(collection(db, 'users', userId, 'devices'), {
+                ...device,
+                user_id: userId,
+                created_at: new Date().toISOString()
+            });
+            const newDevice = { id: docRef.id, ...device, user_id: userId, created_at: new Date().toISOString() };
+            return { data: newDevice, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    updateDevice: async (userId: string, device: Partial<UserDevice> & { id: string | number }) => {
+        try {
+            // Ensure ID is string for Firestore. If number, we might have legacy issue, but let's assume we map it.
+            const deviceId = String(device.id);
+            const docRef = doc(db, 'users', userId, 'devices', deviceId);
+            const { id, ...updates } = device;
+            await updateDoc(docRef, updates);
+            return { data: { ...device }, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    deleteDevice: async (userId: string, deviceId: string | number) => {
+        try {
+            await deleteDoc(doc(db, 'users', userId, 'devices', String(deviceId)));
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        }
+    },
+
+    // --- Download History ---
+    getDownloadHistory: async (userId: string) => {
+        try {
+            const q = query(
+                collection(db, 'users', userId, 'downloads'),
+                orderBy('timestamp', 'desc'),
+                limit(50)
+            );
+            const querySnapshot = await getDocs(q);
+            const history: DownloadHistoryItem[] = [];
+            querySnapshot.forEach((doc) => {
+                history.push({ id: doc.id, ...doc.data() } as any);
+            });
+            return { data: history, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    addDownloadHistory: async (userId: string, item: Omit<DownloadHistoryItem, 'id' | 'timestamp'>) => {
+        try {
+            await addDoc(collection(db, 'users', userId, 'downloads'), {
+                ...item,
+                timestamp: new Date().toISOString()
+            });
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        }
+    },
+
+    deleteDownloadHistoryItem: async (userId: string, itemId: string) => {
+        try {
+            await deleteDoc(doc(db, 'users', userId, 'downloads', itemId));
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        }
+    },
+
+    updateDownloadStatus: async (userId: string, itemId: string, status: 'verified' | 'failed') => {
+        try {
+            const docRef = doc(db, 'users', userId, 'downloads', itemId);
+            await updateDoc(docRef, { status });
+            return { data: { status }, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    // --- Chat History ---
+    getChatHistory: async (userId: string) => {
+        try {
+            const q = query(
+                collection(db, 'users', userId, 'chat_history'),
+                orderBy('created_at', 'asc')
+            );
+            const querySnapshot = await getDocs(q);
+            const messages: any[] = [];
+            querySnapshot.forEach((doc) => {
+                messages.push({ id: doc.id, ...doc.data() });
+            });
+            return { data: messages, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    addChatMessage: async (userId: string, message: any) => {
+        try {
+            await addDoc(collection(db, 'users', userId, 'chat_history'), {
+                ...message,
+                created_at: new Date().toISOString()
+            });
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        }
+    },
+
+    clearChatHistory: async (userId: string) => {
+        try {
+            const q = query(collection(db, 'users', userId, 'chat_history'));
+            const querySnapshot = await getDocs(q);
+            const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        }
+    }
+};

@@ -1,0 +1,7 @@
+{
+  "name": "SoftMonk: Your AI Guide to Safe Software, Games & Drivers (softmonk.co | softmonk.ai)",
+  "description": "Find and install any software or game with confidence. SoftMonk is your cross-platform AI assistant for Windows, macOS, Linux, and Android. Get safe, verified download links from official sources, step-by-step installation guides, and the right drivers for your PC. Avoid malware and bundleware. Stop searching, start doing with SoftMonk, available at softmonk.co and softmonk.ai.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
