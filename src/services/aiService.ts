@@ -164,14 +164,22 @@ export const findSoftware = async (
         return { text: "I didn't catch that. Could you say it again?", type: 'standard' };
     }
 
+    // Switch to Vercel API Route
     try {
-        const openaiChat = httpsCallable(functions, 'openai_chat');
-        const { data } = await openaiChat({ history: historyCopy, filter });
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ history: historyCopy, filter }),
+        });
 
-        if (!data) {
-            throw new Error("Empty response from AI service");
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || `HTTP error ${response.status}`);
         }
 
+        const data = await response.json();
         return data as BotResponse;
 
     } catch (error: any) {
