@@ -10,7 +10,7 @@ import {
     limit
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDevice, DownloadHistoryItem } from '../types';
+import type { UserDevice, DownloadHistoryItem, SoftwareCatalogItem } from '../types';
 
 export const dbService = {
     // --- Devices ---
@@ -154,6 +154,30 @@ export const dbService = {
             return { error: null };
         } catch (error: any) {
             return { error };
+        }
+    },
+
+    // --- Software Catalog (Knowledge Graph) ---
+    getSoftwareCatalog: async () => {
+        try {
+            const q = query(collection(db, 'software_catalog'));
+            const querySnapshot = await getDocs(q);
+            const items: SoftwareCatalogItem[] = [];
+            querySnapshot.forEach((doc) => {
+                items.push({ id: doc.id, ...doc.data() } as SoftwareCatalogItem);
+            });
+            return { data: items, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        }
+    },
+
+    addSoftwareCatalogItem: async (item: Omit<SoftwareCatalogItem, 'id'>) => {
+        try {
+            const docRef = await addDoc(collection(db, 'software_catalog'), item);
+            return { data: { id: docRef.id, ...item }, error: null };
+        } catch (error: any) {
+            return { data: null, error };
         }
     }
 };

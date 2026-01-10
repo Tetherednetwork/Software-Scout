@@ -18,6 +18,12 @@ service cloud.firestore {
       return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'system_engineer';
     }
 
+    // Public read for software catalog (AI Knowledge Base)
+    match /software_catalog/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /users/{userId} {
       allow read: if isAuthenticated(); 
       allow create: if isOwner(userId);

@@ -11,7 +11,7 @@ import {
     addDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { VerifiedSoftware, FullUserProfile, BlogComment, ForumComment, ForumPost, Testimonial, UserFeedback } from '../types';
+import type { VerifiedSoftware, FullUserProfile, BlogComment, ForumComment, ForumPost, Testimonial, UserFeedback, SoftwareCatalogItem } from '../types';
 
 // Helper to fetch user profile
 async function getUserProfile(userId: string) {
@@ -86,6 +86,41 @@ export async function deleteSoftware(id: string | number): Promise<void> {
         console.error('Error deleting software:', error);
         throw error;
     }
+}
+
+// --- Software Catalog (Knowledge Graph) ---
+export async function getSoftwareCatalog(): Promise<SoftwareCatalogItem[]> {
+    try {
+        const q = query(collection(db, 'software_catalog'), orderBy('name', 'asc'));
+        const snap = await getDocs(q);
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as SoftwareCatalogItem));
+    } catch (error) {
+        console.error('Error fetching software catalog:', error);
+        throw error;
+    }
+}
+
+export async function upsertSoftwareCatalogItem(item: Partial<SoftwareCatalogItem>): Promise<SoftwareCatalogItem> {
+    try {
+        let id = item.id;
+        let data = { ...item };
+        delete data.id;
+
+        if (id) {
+            await updateDoc(doc(db, 'software_catalog', String(id)), data);
+        } else {
+            const docRef = await addDoc(collection(db, 'software_catalog'), data);
+            id = docRef.id;
+        }
+        return { id, ...data } as SoftwareCatalogItem;
+    } catch (error) {
+        console.error('Error upserting catalog item:', error);
+        throw error;
+    }
+}
+
+export async function deleteSoftwareCatalogItem(id: string): Promise<void> {
+    await deleteDoc(doc(db, 'software_catalog', id));
 }
 
 

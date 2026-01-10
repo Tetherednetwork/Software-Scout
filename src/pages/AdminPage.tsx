@@ -44,8 +44,8 @@ export const AdminPage: React.FC<AdminPageProps> = ({ session, onUserDataChange 
         setError('');
         try {
             if (managementView === 'software') {
-                const data = await adminService.getVerifiedSoftware();
-                setSoftwareList(data);
+                const data = await adminService.getSoftwareCatalog();
+                setSoftwareList(data as any);
             } else if (managementView === 'users') {
                 const data = await adminService.getUsers();
                 setUsers(data);
@@ -273,27 +273,151 @@ export const AdminPage: React.FC<AdminPageProps> = ({ session, onUserDataChange 
 
             {managementView === 'software' && (
                 <div>
+                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <h3 className="font-bold text-lg mb-2 text-blue-800 dark:text-blue-300">AI Knowledge Base (Knowledge Graph)</h3>
+                        <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">
+                            This is the database the 'Technician' uses to answer questions.
+                            If this list is empty, the AI will default to OpenAI general knowledge (less precise).
+                        </p>
+                        <button
+                            onClick={async () => {
+                                if (!window.confirm("This will upload standard drivers/apps to the database. Continue?")) return;
+                                const initialData = [
+                                    {
+                                        "name": "NVIDIA GeForce Game Ready Driver",
+                                        "keywords": ["nvidia", "geforce", "driver", "gpu", "rtx", "gtx"],
+                                        "category": "driver",
+                                        "os_compatibility": ["Windows 10", "Windows 11"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["gpu_model", "os_version"],
+                                        "download_pattern": "https://www.nvidia.com/Download/index.aspx?lang=en-us",
+                                        "verified": true,
+                                        "manufacturer": "NVIDIA"
+                                    },
+                                    {
+                                        "name": "AMD Software: Adrenalin Edition",
+                                        "keywords": ["amd", "radeon", "driver", "gpu", "rx", "adrenalin"],
+                                        "category": "driver",
+                                        "os_compatibility": ["Windows 10", "Windows 11"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["os_version"],
+                                        "download_pattern": "https://www.amd.com/en/support",
+                                        "verified": true,
+                                        "manufacturer": "AMD"
+                                    },
+                                    {
+                                        "name": "Intel Graphics Driver",
+                                        "keywords": ["intel", "graphics", "driver", "uhd", "iris", "arc"],
+                                        "category": "driver",
+                                        "os_compatibility": ["Windows 10", "Windows 11"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["os_version"],
+                                        "download_pattern": "https://www.intel.com/content/www/us/en/download-center/home.html",
+                                        "verified": true,
+                                        "manufacturer": "Intel"
+                                    },
+                                    {
+                                        "name": "Google Chrome",
+                                        "keywords": ["chrome", "browser", "internet"],
+                                        "category": "application",
+                                        "os_compatibility": ["Windows", "macOS", "Linux", "Android"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["os_version"],
+                                        "download_pattern": "https://www.google.com/chrome/",
+                                        "verified": true,
+                                        "manufacturer": "Google"
+                                    },
+                                    {
+                                        "name": "VLC Media Player",
+                                        "keywords": ["vlc", "player", "video"],
+                                        "category": "application",
+                                        "os_compatibility": ["Windows", "macOS", "Linux"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["os_version"],
+                                        "download_pattern": "https://www.videolan.org/vlc/",
+                                        "verified": true,
+                                        "manufacturer": "VideoLAN"
+                                    },
+                                    {
+                                        "name": "DirectX End-User Runtime Web Installer",
+                                        "keywords": ["directx", "dx", "runtime", "game error", "missing dll"],
+                                        "category": "runtime",
+                                        "os_compatibility": ["Windows 10", "Windows 11", "Windows 7"],
+                                        "arch": ["32-bit", "64-bit"],
+                                        "required_fields": ["os_version"],
+                                        "download_pattern": "https://www.microsoft.com/en-us/download/details.aspx?id=35",
+                                        "verified": true,
+                                        "manufacturer": "Microsoft"
+                                    },
+                                    {
+                                        "name": "Dell Drivers Support",
+                                        "keywords": ["dell", "driver", "laptop", "inspiron", "xps", "latitude"],
+                                        "category": "driver",
+                                        "os_compatibility": ["Windows 10", "Windows 11"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["laptop_model"],
+                                        "download_pattern": "https://www.dell.com/support/home/en-us?app=drivers",
+                                        "verified": true,
+                                        "manufacturer": "Dell"
+                                    },
+                                    {
+                                        "name": "HP Drivers Support",
+                                        "keywords": ["hp", "hewlett packard", "driver", "laptop", "pavilion", "envy"],
+                                        "category": "driver",
+                                        "os_compatibility": ["Windows 10", "Windows 11"],
+                                        "arch": ["64-bit"],
+                                        "required_fields": ["laptop_model"],
+                                        "download_pattern": "https://support.hp.com/us-en/drivers",
+                                        "verified": true,
+                                        "manufacturer": "HP"
+                                    }
+                                ];
+
+                                setIsLoading(true);
+                                try {
+                                    for (const item of initialData) {
+                                        await adminService.upsertSoftwareCatalogItem(item as any);
+                                    }
+                                    alert("Database seeded successfully!");
+                                    loadData();
+                                } catch (e) {
+                                    alert("Error seeding: " + e);
+                                } finally {
+                                    setIsLoading(false);
+                                }
+                            }}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-bold"
+                        >
+                            Seed Initial Database
+                        </button>
+                    </div>
+
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Software Management</h2>
-                        <button onClick={() => setEditingSoftware({})} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><PlusIcon /> Add Software</button>
+                        <h2 className="text-xl font-bold">Software Catalog</h2>
+                        {/* TODO: Update SoftwareForm to handle new schema */}
+                        <button disabled className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed"><PlusIcon /> Add New (Coming Soon)</button>
                     </div>
                     <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                         <table className="w-full text-sm text-left text-gray-500 dark:text-white">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
                                 <tr>
                                     <th scope="col" className="px-6 py-3">Name</th>
-                                    <th scope="col" className="px-6 py-3 hidden md:table-cell">Homepage</th>
+                                    <th scope="col" className="px-6 py-3">Category</th>
+                                    <th scope="col" className="px-6 py-3">Manufacturer</th>
                                     <th scope="col" className="px-6 py-3 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {softwareList.map(item => (
+                                {softwareList.map((item: any) => (
                                     <tr key={item.id} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{item.name}</td>
-                                        <td className="px-6 py-4 hidden md:table-cell truncate max-w-xs"><a href={item.homepage_url} target="_blank" rel="noopener noreferrer" className="hover:underline">{item.homepage_url}</a></td>
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                            {item.name}
+                                            {item.verified && <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Verified</span>}
+                                        </td>
+                                        <td className="px-6 py-4">{item.category}</td>
+                                        <td className="px-6 py-4">{item.manufacturer}</td>
                                         <td className="px-6 py-4 text-right space-x-2">
-                                            <button onClick={() => setEditingSoftware(item)} className="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><PencilIcon /></button>
-                                            <button onClick={() => handleSoftwareDelete(item.id)} className="p-2 text-gray-500 hover:text-red-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><TrashIcon /></button>
+                                            <button onClick={() => adminService.deleteSoftwareCatalogItem(item.id).then(loadData)} className="p-2 text-gray-500 hover:text-red-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><TrashIcon /></button>
                                         </td>
                                     </tr>
                                 ))}

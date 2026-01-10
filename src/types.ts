@@ -254,3 +254,16 @@ export type ContentView = 'blogPosts' | 'blogComments' | 'forumPosts' | 'forumCo
 export type AIProvider = 'gemini' | 'openai' | 'azure' | 'deepseek';
 
 export type Page = 'home' | 'about' | 'forum' | 'blogs' | 'file-verifier' | 'blog-post' | 'admin' | 'forum-post';
+
+export interface SoftwareCatalogItem {
+  id?: string;
+  name: string;
+  keywords: string[];
+  category: 'driver' | 'runtime' | 'game' | 'application' | 'game_platform';
+  os_compatibility: string[];
+  arch: string[];
+  required_fields: string[];
+  download_pattern: string;
+  verified: boolean;
+  manufacturer: string;
+}
