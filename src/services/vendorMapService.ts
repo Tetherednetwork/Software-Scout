@@ -13,6 +13,16 @@ export interface Vendor {
     [key: string]: string | null | undefined;
 }
 
+// --- FALLBACK KNOWLEDGE (Client-side Safety Net) ---
+const FALLBACK_VENDORS = [
+    { "name": "NVIDIA GeForce Driver", "homepage": "https://www.nvidia.com", "windows": "https://www.nvidia.com" },
+    { "name": "Google Chrome", "homepage": "https://www.google.com/chrome", "windows": "https://www.google.com/chrome" },
+    { "name": "VLC Media Player", "homepage": "https://www.videolan.org/vlc", "windows": "https://www.videolan.org/vlc" },
+    { "name": "Steam", "homepage": "https://store.steampowered.com", "windows": "https://store.steampowered.com" },
+    { "name": "Visual Studio Code", "homepage": "https://code.visualstudio.com", "windows": "https://code.visualstudio.com" },
+    { "name": "Discord", "homepage": "https://discord.com", "windows": "https://discord.com" }
+];
+
 // Cache the vendor map in memory to avoid repeated DB calls
 let vendorMap: Vendor[] | null = null;
 
@@ -22,6 +32,12 @@ export async function getVendorMap(): Promise<Vendor[]> {
     try {
         console.log("Fetching verified software list from Firestore (software_catalog)...");
         const querySnapshot = await getDocs(collection(db, 'software_catalog'));
+
+        if (querySnapshot.empty) {
+            console.warn("Firestore software_catalog is empty. Using Fallback.");
+            vendorMap = FALLBACK_VENDORS.map(v => ({ ...v, mac: null, linux: null, android: null }) as Vendor);
+            return vendorMap;
+        }
 
         const data: Vendor[] = [];
         querySnapshot.forEach((doc) => {
@@ -33,11 +49,11 @@ export async function getVendorMap(): Promise<Vendor[]> {
                 name: d.name,
                 homepage: d.download_pattern,
                 // Simple heuristic mapping for legacy fields
-                windows: d.os_compatibility.some(os => os.includes('Windows')) ? d.download_pattern : null,
-                mac: d.os_compatibility.some(os => os.includes('macOS')) ? d.download_pattern : null,
-                linux: d.os_compatibility.some(os => os.includes('Linux')) ? d.download_pattern : null,
-                android: d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null
-            });
+                windows: d.os_compatibility && d.os_compatibility.some(os => os.includes('Windows')) ? d.download_pattern : null,
+                mac: d.os_compatibility && d.os_compatibility.some(os => os.includes('macOS')) ? d.download_pattern : null,
+                linux: d.os_compatibility && d.os_compatibility.some(os => os.includes('Linux')) ? d.download_pattern : null,
+                android: d.os_compatibility && d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null
+            } as Vendor);
         });
 
         if (data.length > 0) {
