@@ -1,10 +1,10 @@
-import type { Platform } from '../types';
+import type { Platform, SoftwareCatalogItem } from '../types';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface Vendor {
     name: string;
-    slug?: string; // Not in DB, made optional
+    slug?: string;
     homepage: string;
     windows: string | null;
     mac: string | null;
@@ -16,30 +16,28 @@ export interface Vendor {
 // Cache the vendor map in memory to avoid repeated DB calls
 let vendorMap: Vendor[] | null = null;
 
-/**
- * Fetches the verified software list from the Firestore database.
- * If the database call fails, it falls back to the local JSON file.
- * The result is cached in memory for the duration of the session.
- * @returns A promise that resolves to an array of Vendor objects.
- */
 export async function getVendorMap(): Promise<Vendor[]> {
     if (vendorMap) return vendorMap;
 
     try {
-        console.log("Fetching verified software list from Firestore...");
-        const querySnapshot = await getDocs(collection(db, 'verified_software'));
+        console.log("Fetching verified software list from Firestore (software_catalog)...");
+        const querySnapshot = await getDocs(collection(db, 'software_catalog'));
 
         const data: Vendor[] = [];
         querySnapshot.forEach((doc) => {
-            const d = doc.data();
+            const d = doc.data() as SoftwareCatalogItem;
+
+            // Map the new Knowledge Graph Schema to the legacy Vendor interface
+            // used by the Frontend Search/Trends widgets.
             data.push({
                 name: d.name,
-                homepage: d.homepage_url, // Remap fields to match Vendor interface
-                windows: d.windows_url,
-                mac: d.macos_url,
-                linux: d.linux_url,
-                android: d.android_url
-            } as Vendor);
+                homepage: d.download_pattern,
+                // Simple heuristic mapping for legacy fields
+                windows: d.os_compatibility.some(os => os.includes('Windows')) ? d.download_pattern : null,
+                mac: d.os_compatibility.some(os => os.includes('macOS')) ? d.download_pattern : null,
+                linux: d.os_compatibility.some(os => os.includes('Linux')) ? d.download_pattern : null,
+                android: d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null
+            });
         });
 
         if (data.length > 0) {
