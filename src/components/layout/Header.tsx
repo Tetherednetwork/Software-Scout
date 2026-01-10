@@ -48,8 +48,11 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
         { name: 'About', page: 'about' },
         { name: 'Community Forum', page: 'forum' },
         { name: 'File Verifier', page: 'file-verifier', tourId: 'file-verifier-link' },
-        ...(isAdmin ? [{ name: 'Admin', page: 'admin' as const, icon: <CogIcon/> }] : [])
     ];
+
+    if (isAdmin) {
+        navLinks.push({ name: 'Admin', page: 'admin' as const, icon: <CogIcon /> });
+    }
 
     const NavLink: React.FC<{ name: string; page: Page; tourId?: string; isMobile?: boolean; icon?: React.ReactNode; }> = ({ name, page, tourId, isMobile, icon }) => (
         <button
@@ -76,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
                     </p>
                 </div>
             </div>
-            
+
             {/* Main Navigation */}
             <nav className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
                         <div className="hidden lg:flex items-center gap-2" data-tour-id="main-nav">
                             {navLinks.map(link => <NavLink key={link.page} {...link} />)}
                         </div>
-                        
+
                         {/* Right Side Controls & Hamburger */}
                         <div className="flex items-center gap-2">
                             <div className="hidden lg:flex items-center gap-2">
@@ -128,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
                                 >
                                     <InformationIcon className="h-5 w-5" />
                                 </button>
-                                
+
                                 <button
                                     onClick={onOpenDownloadHistoryModal}
                                     data-tour-id="download-history"
@@ -138,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
                                 >
                                     <FileIcon className="h-5 w-5" />
                                 </button>
-                                
+
                                 <button
                                     className="p-3 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-[#4F8A54]"
                                     aria-label="Accessibility Options"
@@ -149,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
 
                                 <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} />
                             </div>
-                             {/* Hamburger Menu Button */}
+                            {/* Hamburger Menu Button */}
                             <div className="lg:hidden flex items-center gap-2">
                                 {session && <NotificationBell session={session} />}
                                 <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} />
@@ -171,8 +174,8 @@ const Header: React.FC<HeaderProps> = ({ session, isAdmin, currentPage, onNavCli
                 {isMobileMenuOpen && (
                     <div className="lg:hidden" id="mobile-menu">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
-                             {navLinks.map(link => <NavLink key={link.page} {...link} isMobile />)}
-                             <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+                            {navLinks.map(link => <NavLink key={link.page} {...link} isMobile />)}
+                            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                                 {session ? (
                                     <div className="px-3 space-y-2">
                                         <button onClick={() => { onProfileClick(); setIsMobileMenuOpen(false); }} className="block w-full text-left p-3 text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md">
