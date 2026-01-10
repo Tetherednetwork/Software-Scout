@@ -18,14 +18,12 @@ service cloud.firestore {
       return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'system_engineer';
     }
 
-    // --- Users Collection ---
     match /users/{userId} {
-      allow read: if isAuthenticated(); // Users can read other profiles (for avatars/names)
-      allow create: if isOwner(userId); // Users can create their own profile on signup
-      allow update: if isOwner(userId); // Users can update their own profile
-      allow delete: if false; // Only admins or soft-delete
+      allow read: if isAuthenticated(); 
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;
       
-      // Sub-collections
       match /download_history/{itemId} {
         allow read, write: if isOwner(userId);
       }
@@ -33,6 +31,17 @@ service cloud.firestore {
       match /devices/{deviceId} {
          allow read, write: if isOwner(userId);
       }
+
+      // Add missing chat_history subcollection
+      match /chat_history/{chatId} {
+         // Temp Public for debug, or isOwner
+         allow read, write: if isOwner(userId);
+      }
+    }
+
+    // --- User Devices (Top Level used by aiService) ---
+    match /user_devices/{deviceId} {
+       allow read, write: if isAuthenticated() && (resource.data.user_id == request.auth.uid || request.resource.data.user_id == request.auth.uid);
     }
 
     // --- Forum ---
@@ -112,6 +121,16 @@ service cloud.firestore {
         allow create: if isAuthenticated();
         // Allow update/delete if owner or admin
         allow update, delete: if isAuthenticated() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+    // --- Verified Software (Public Read) ---
+    match /verified_software/{softwareId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    
+    // --- Global Chat History (Temp Debug: Public) ---
+    match /chat_history/{chatId} {
+       allow read, write: if true;
     }
   }
 }
