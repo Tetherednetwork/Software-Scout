@@ -1,7 +1,5 @@
-
-import { db, functions } from './firebase';
+import { db } from './firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
 import type { Message, SoftwareFilter, Session, GroundingChunk, Platform, UserDevice } from '../types';
 import { findInVendorMap, detectPlatform } from './vendorMapService';
 
