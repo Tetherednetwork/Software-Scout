@@ -4,13 +4,63 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const knowledgeBase = [
     {
         "name": "NVIDIA GeForce Driver",
-        "keywords": ["nvidia", "geforce", "driver", "gpu", "graphics card"],
+        "keywords": ["nvidia", "geforce", "driver", "gpu", "graphics card", "rtx", "gtx"],
         "category": "driver",
         "os": ["Windows 10", "Windows 11"],
         "arch": ["64-bit"],
         "required_fields": ["gpu_model", "os_version", "arch"],
-        "optional_fields": ["laptop_brand"],
+        "optional_fields": [],
         "download_pattern": "https://www.nvidia.com/Download/index.aspx?lang=en-us"
+    },
+    {
+        "name": "AMD Radeon Driver",
+        "keywords": ["amd", "radeon", "driver", "gpu", "graphics", "rx"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
+        "download_pattern": "https://www.amd.com/en/support"
+    },
+    {
+        "name": "Intel Graphics Driver",
+        "keywords": ["intel", "graphics", "driver", "uhd", "iris", "arc"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
+        "download_pattern": "https://www.intel.com/content/www/us/en/download-center/home.html"
+    },
+    {
+        "name": "Dell Drivers Support",
+        "keywords": ["dell", "driver", "laptop", "inspiron", "xps", "latitude"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["laptop_brand"],
+        "optional_fields": [],
+        "download_pattern": "https://www.dell.com/support/home/en-us?app=drivers"
+    },
+    {
+        "name": "HP Drivers Support",
+        "keywords": ["hp", "hewlett packard", "driver", "laptop", "pavilion", "envy", "spectre"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["laptop_brand"],
+        "optional_fields": [],
+        "download_pattern": "https://support.hp.com/us-en/drivers"
+    },
+    {
+        "name": "Lenovo Drivers Support",
+        "keywords": ["lenovo", "driver", "laptop", "thinkpad", "ideapad", "yoga"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["laptop_brand"],
+        "optional_fields": [],
+        "download_pattern": "https://pcsupport.lenovo.com/us/en/products/"
     },
     {
         "name": "Adobe Photoshop",
@@ -18,8 +68,8 @@ const knowledgeBase = [
         "category": "application",
         "os": ["Windows", "macOS"],
         "arch": ["64-bit"],
-        "required_fields": ["os_version", "arch"],
-        "optional_fields": ["ram_gb"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
         "download_pattern": "https://www.adobe.com/products/photoshop.html"
     },
     {
