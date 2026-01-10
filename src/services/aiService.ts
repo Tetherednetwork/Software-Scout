@@ -191,8 +191,9 @@ export const findSoftware = async (
 
         if (error.code === 'functions/unavailable' || error.message.includes('network')) {
             friendlyMessage = "I'm having trouble connecting to the internet. Please check your connection.";
-        } else if (error.code === 'functions/internal') {
-            friendlyMessage = "I encountered an internal glitch. I'm retrying my systems. Please ask me again.";
+        } else {
+            // Debug: Show actual error
+            friendlyMessage = `System Debug Error: ${error.message}. Please verify Vercel API Route configuration and OpenAI Key Settings.`;
         }
 
         return {
