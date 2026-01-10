@@ -200,12 +200,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             } else {
                 // All fields present!
-                // Give the solution.
-                const solution = `I have confirmed you need ${candidate.name} for ${context.os_version} (${context.arch || 'Standard'}). \n\nHere is your official download link: ${candidate.download_pattern}`;
+                // Give the solution with a structured "Grounding Chunk" to trigger the UI Button.
+                const solution = `I have confirmed you need ${candidate.name} for ${context.os_version} (${context.arch || 'Standard'}).\n\nI have verified the official source below.`;
+
                 return res.status(200).json({
                     text: solution,
-                    type: 'standard',
-                    groundingChunks: []
+                    type: candidate.category === 'driver' ? 'driver' : (candidate.category === 'game_platform' ? 'game' : 'software'),
+                    groundingChunks: [
+                        {
+                            web: {
+                                uri: candidate.download_pattern,
+                                title: candidate.name + " Official Download"
+                            }
+                        }
+                    ]
                 });
             }
 
