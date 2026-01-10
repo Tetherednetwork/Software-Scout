@@ -1,6 +1,58 @@
 import OpenAI from 'openai';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import knowledgeBase from './tech_knowledge.json';
+
+const knowledgeBase = [
+    {
+        "name": "NVIDIA GeForce Driver",
+        "keywords": ["nvidia", "geforce", "driver", "gpu", "graphics card"],
+        "category": "driver",
+        "os": ["Windows 10", "Windows 11"],
+        "arch": ["64-bit"],
+        "required_fields": ["gpu_model", "os_version", "arch"],
+        "optional_fields": ["laptop_brand"],
+        "download_pattern": "https://www.nvidia.com/Download/index.aspx?lang=en-us"
+    },
+    {
+        "name": "Adobe Photoshop",
+        "keywords": ["photoshop", "adobe", "photo editor"],
+        "category": "application",
+        "os": ["Windows", "macOS"],
+        "arch": ["64-bit"],
+        "required_fields": ["os_version", "arch"],
+        "optional_fields": ["ram_gb"],
+        "download_pattern": "https://www.adobe.com/products/photoshop.html"
+    },
+    {
+        "name": "Steam",
+        "keywords": ["steam", "valve", "store", "game"],
+        "category": "game_platform",
+        "os": ["Windows", "macOS", "Linux"],
+        "arch": ["32-bit", "64-bit"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
+        "download_pattern": "https://store.steampowered.com/about/"
+    },
+    {
+        "name": "VLC Media Player",
+        "keywords": ["vlc", "player", "video"],
+        "category": "application",
+        "os": ["Windows", "macOS", "Linux"],
+        "arch": ["32-bit", "64-bit"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
+        "download_pattern": "https://www.videolan.org/vlc/"
+    },
+    {
+        "name": "Google Chrome",
+        "keywords": ["chrome", "browser", "internet"],
+        "category": "application",
+        "os": ["Windows", "macOS", "Linux", "Android"],
+        "arch": ["32-bit", "64-bit"],
+        "required_fields": ["os_version"],
+        "optional_fields": [],
+        "download_pattern": "https://www.google.com/chrome/"
+    }
+];
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
