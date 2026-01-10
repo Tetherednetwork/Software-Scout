@@ -14,6 +14,7 @@ interface SoftwareListItem {
     name: string;
     description: string;
     url: string;
+    logo?: string;
 }
 
 
@@ -33,11 +34,24 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
             const nameMatch = itemStr.match(/\*\*(.*?)\*\*/);
             const descMatch = itemStr.match(/\*Description\*:\s*(.*?)(?=\n*\*Official Source\*|\[END_ITEM\])/);
             const urlMatch = itemStr.match(/\*Official Source\*:\s*(https?:\/\/[^\s]+)/);
+            // We need a way to pass the logo in the text hack, or guess it.
+            // Since our backend doesn't put "Logo" in the text string yet, let's use the Clearbit hack on frontend if url exists.
+
+            const url = urlMatch ? urlMatch[1].trim() : '';
+            let logo = '';
+            try {
+                if (url) {
+                    const hostname = new URL(url).hostname;
+                    logo = `https://logo.clearbit.com/${hostname}`;
+                }
+            } catch (e) { }
+
 
             return {
                 name: nameMatch ? nameMatch[1].replace(/^\d+\.\s*/, '').trim() : 'Unknown Software',
                 description: descMatch ? descMatch[1].trim() : 'No description available.',
-                url: urlMatch ? urlMatch[1].trim() : ''
+                url: url,
+                logo: logo
             };
         }).filter(item => item.url);
 
@@ -51,24 +65,31 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
                         {introText && <p className="whitespace-pre-wrap mb-4" dangerouslySetInnerHTML={{ __html: introText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />}
                         <div className="space-y-4">
                             {parsedItems.map((item, index) => (
-                                <div key={index} className="p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-gray-200 dark:border-gray-600">
-                                    <h4 className="font-bold text-lg text-gray-900 dark:text-white">{item.name}</h4>
-                                    <p className="text-sm text-gray-600 dark:text-white mt-1 mb-3">{item.description}</p>
-                                    <a
-                                        href={item.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={() => onDownload({
-                                            software_name: item.name,
-                                            url: item.url,
-                                            type: 'software',
-                                            platform: platform
-                                        })}
-                                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-gradient text-white font-semibold rounded-md hover:opacity-90 transition-opacity shadow text-sm"
-                                    >
-                                        <DownloadIcon />
-                                        Download
-                                    </a>
+                                <div key={index} className="p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-gray-200 dark:border-gray-600 flex gap-4 items-start">
+                                    {item.logo && (
+                                        <div className="w-12 h-12 bg-white rounded-lg shadow-sm p-1 flex items-center justify-center flex-shrink-0">
+                                            <img src={item.logo} alt={item.name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }} />
+                                        </div>
+                                    )}
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-lg text-gray-900 dark:text-white">{item.name}</h4>
+                                        <p className="text-sm text-gray-600 dark:text-white mt-1 mb-3">{item.description}</p>
+                                        <a
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => onDownload({
+                                                software_name: item.name,
+                                                url: item.url,
+                                                type: 'software',
+                                                platform: platform
+                                            })}
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-gradient text-white font-semibold rounded-md hover:opacity-90 transition-opacity shadow text-sm"
+                                        >
+                                            <DownloadIcon />
+                                            Download
+                                        </a>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -273,7 +294,22 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
                         ref={attachCopyListeners}
                     />
 
-                    {options.length > 0 && (
+                    {/* Rendering Clickable Options (Chips) */}
+                    {(message.options && message.options.length > 0) ? (
+                        <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600 flex flex-wrap gap-2">
+                            {message.options.map((option) => (
+                                <button
+                                    key={option}
+                                    onClick={() => onOptionSelect(option)}
+                                    // Disable if not latest or user has already acted (optimistic)
+                                    // For now, always enable on latest to allow correction
+                                    className="px-4 py-2 bg-primary-gradient text-white font-semibold rounded-lg hover:opacity-90 transition-opacity shadow-sm"
+                                >
+                                    {option}
+                                </button>
+                            ))}
+                        </div>
+                    ) : (options.length > 0 && ( /* Fallback to regex parsed options */
                         <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600 flex flex-wrap gap-2">
                             {options.map((option) => (
                                 <button
@@ -286,7 +322,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
                                 </button>
                             ))}
                         </div>
-                    )}
+                    ))}
 
                     {(type === 'software' || type === 'game') && text.includes('Would you like help installing this?') && isLatestBotMessage && (
                         <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600 flex flex-wrap gap-2">

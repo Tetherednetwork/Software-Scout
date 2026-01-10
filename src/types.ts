@@ -30,7 +30,8 @@ export interface Message {
   text: string;
   sender: 'user' | 'bot';
   groundingChunks?: GroundingChunk[];
-  type?: 'software' | 'driver' | 'game' | 'driver-input-prompt' | 'standard' | 'installation-guide' | 'software-list' | 'driver-device-prompt' | 'driver-device-selection' | 'platform-prompt' | 'software-clarification-prompt';
+  options?: string[];
+  type?: 'software' | 'driver' | 'game' | 'driver-input-prompt' | 'standard' | 'installation-guide' | 'software-list' | 'driver-device-prompt' | 'driver-device-selection' | 'platform-prompt' | 'software-clarification-prompt' | 'question';
   platform?: Platform;
   // DB fields
   user_id?: string;

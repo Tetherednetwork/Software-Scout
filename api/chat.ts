@@ -248,20 +248,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
             if (missingField) {
-                // Ask precision question
+                // Ask the question!
                 let question = "";
+                let options: string[] = [];
+                let type: any = 'question';
+
                 switch (missingField) {
                     case "os_version":
-                        question = `For user ${candidate.manufacturer} driver installation, please specify: Windows 10 or Windows 11?`;
+                        question = `For user ${candidate.manufacturer} driver installation, please select your Operating System version:`;
+                        options = ["Windows 11", "Windows 10", "macOS", "Linux"];
                         break;
                     case "arch":
                         question = `Is your system 64-bit (x64) or 32-bit?`;
+                        options = ["64-bit", "32-bit"];
                         break;
                     case "gpu_model":
-                        question = `To select the correct Game Ready Driver, I need your NVIDIA GPU model (e.g., RTX 3060, GTX 1660).`;
+                        question = `To select the correct Game Ready Driver, I need your NVIDIA GPU model.`;
+                        options = ["RTX 4090", "RTX 4080", "RTX 3070", "RTX 3060", "GTX 1660"];
                         break;
                     case "laptop_model":
-                        question = `Which specific ${candidate.manufacturer} model do you have? (e.g., Pavilion 15, XPS 13)`;
+                        question = `Which specific ${candidate.manufacturer} model do you have?`;
+                        // Dynamic options hard for generic models, but could list series
+                        options = ["Pavilion", "Envy", "Spectre", "Omen"];
                         break;
                     default:
                         question = `I need to know: ${missingField}`;
@@ -269,7 +277,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
                 return res.status(200).json({
                     text: question,
-                    type: 'standard',
+                    type: type,
+                    options: options,
                     groundingChunks: []
                 });
 
@@ -292,6 +301,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
         } else {
+
+            // Check for "Top X" or "Trend" intent via simple keyword check first to save LLM tokens or specifically guide it
+            if (userText.toLowerCase().includes('top') || userText.toLowerCase().includes('best') || userText.toLowerCase().includes('trend')) {
+                if (userText.toLowerCase().includes('antivirus')) {
+                    const antivirusList = [
+                        { name: "Norton 360", description: "Comprehensive protection with VPN.", url: "https://us.norton.com/", logo: "https://logo.clearbit.com/norton.com" },
+                        { name: "Bitdefender", description: "Top-rated threat detection.", url: "https://www.bitdefender.com/", logo: "https://logo.clearbit.com/bitdefender.com" },
+                        { name: "McAfee Total Protection", description: "Identity monitoring & antivirus.", url: "https://www.mcafee.com/", logo: "https://logo.clearbit.com/mcafee.com" },
+                        { name: "Malwarebytes", description: "Specialized malware removal.", url: "https://www.malwarebytes.com/", logo: "https://logo.clearbit.com/malwarebytes.com" },
+                        { name: "ESET NOD32", description: "Fast & light-weight security.", url: "https://www.eset.com/", logo: "https://logo.clearbit.com/eset.com" }
+                    ];
+
+                    const listText = "Here are the top antivirus software trends for 2024 based on online security rankings:\n" +
+                        antivirusList.map(item => `[START_ITEM] **${item.name}** \n*Description*: ${item.description} \n*Official Source*: ${item.url}`).join("\n");
+
+                    return res.status(200).json({
+                        text: listText,
+                        type: 'software-list',
+                        groundingChunks: []
+                    });
+                }
+            }
+
             // Fallback: Senior Technician Persona
             const messages = history.map((msg: any) => ({
                 role: (msg.sender === 'bot' ? 'assistant' : 'user') as 'assistant' | 'user' | 'system',
@@ -302,6 +334,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             You help users find EXACT drivers, software, and runtimes.
             If the user asks for "drivers", ask "For which component? (GPU, Chipset, Printer?)".
             Keep answers precise and technical but accessible.
+            If user asks for "Top 5 [category]", list them if you know, but the system has a special handler for specific ones.
             `;
             messages.unshift({ role: "system", content: systemPrompt });
 
