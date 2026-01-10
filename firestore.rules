@@ -13,9 +13,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      // Basic role check based on user profile. 
-      // Note: Ideally use Custom Claims for security, but this reads from the document for now.
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'system_engineer';
+      // Global Admin Hardcoded + Database Role Check
+      return isAuthenticated() && (
+         request.auth.token.email == 'folarin.gbenga@gmail.com' || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
     }
 
     // Public read for software catalog (AI Knowledge Base)

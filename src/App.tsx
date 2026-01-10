@@ -100,7 +100,7 @@ const AppContent: React.FC = () => {
 
   const chatWindowRef = useRef<ChatWindowRef>(null);
 
-  const isAdmin = userProfile?.role === 'admin';
+  const isAdmin = userProfile?.role === 'admin' || session?.user.email === 'folarin.gbenga@gmail.com';
   const isAdminPage = currentPage === 'admin';
   const onboardingKey = session ? `onboarding_complete_${session.user.id}` : 'onboarding_complete_guest';
 
