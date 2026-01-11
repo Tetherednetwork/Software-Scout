@@ -203,8 +203,8 @@ export async function getCommentsForPost(postId: string | number, userId?: strin
  */
 export async function createPost(postData: { userId: string; title: string; content: string; file: File | null; category: ForumPost['category']; status: 'approved' | 'pending'; image_url?: string | null }): Promise<{ success: boolean }> {
     try {
-        let file_url: string | undefined = undefined;
-        let file_name: string | undefined = undefined;
+        let file_url: string | null = null;
+        let file_name: string | null = null;
 
         if (postData.file) {
             const fileExt = postData.file.name.split('.').pop();
@@ -221,9 +221,9 @@ export async function createPost(postData: { userId: string; title: string; cont
             content: postData.content,
             category: postData.category,
             status: postData.status,
-            image_url: postData.image_url,
-            file_url,
-            file_name,
+            image_url: postData.image_url || null,
+            file_url: file_url || null,
+            file_name: file_name || null,
             created_at: new Date().toISOString(),
             comment_count: 0,
             like_count: 0
@@ -247,7 +247,7 @@ export async function updatePost(postData: { id: string | number; title: string;
             content: postData.content,
             category: postData.category,
             status: postData.status,
-            image_url: postData.image_url
+            image_url: postData.image_url || null
         });
     } catch (error) {
         console.error("Error updating post:", error);
