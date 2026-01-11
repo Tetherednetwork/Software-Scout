@@ -234,6 +234,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
             icon = <YouTubeIcon />;
             title = platformName ? `Installation Help for ${platformName}` : 'Installation Help';
             secondaryIcon = getPlatformIcon(platform);
+        } else if (mainDownloadChunk) {
+            // Fallback: If we have a download link but type is standard/unknown, treat as software
+            icon = <SoftwareIcon />;
+            title = 'Software Found';
         } else {
             return null;
         }
