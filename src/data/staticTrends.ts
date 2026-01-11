@@ -4,18 +4,28 @@ import type { TrendingTopic } from '../types';
 // SVGs as Data URIs/URLs for instant loading/caching
 const LOGOS = {
     // Startups / New Tools
-    arc: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Arc_Browser_logo.svg",
-    notion: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg",
-    figma: "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
-    openai: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
-    perplexity: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Perplexity_AI_logo.svg", // Fallback or find specific
+    arc: "https://logo.clearbit.com/arc.net",
+    notion: "https://logo.clearbit.com/notion.so",
+    figma: "https://logo.clearbit.com/figma.com",
+    openai: "https://logo.clearbit.com/openai.com",
+    perplexity: "https://logo.clearbit.com/perplexity.ai",
 
     // Antivirus
-    mcafee: "https://upload.wikimedia.org/wikipedia/commons/2/2f/McAfee_Shield_Logo.svg",
-    norton: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Norton_AntiVirus_logo.png",
-    bitdefender: "https://upload.wikimedia.org/wikipedia/commons/3/30/Bitdefender_Antivirus_Logo.svg",
-    avast: "https://upload.wikimedia.org/wikipedia/commons/f/f7/Avast_Antivirus_logo.svg",
-    totalav: "https://www.totalav.com/static/images/logo.svg"
+    mcafee: "https://logo.clearbit.com/mcafee.com",
+    norton: "https://logo.clearbit.com/norton.com",
+    bitdefender: "https://logo.clearbit.com/bitdefender.com",
+    avast: "https://logo.clearbit.com/avast.com",
+    totalav: "https://logo.clearbit.com/totalav.com",
+
+    // Others
+    chrome: "https://logo.clearbit.com/google.com",
+    vscode: "https://logo.clearbit.com/code.visualstudio.com",
+    discord: "https://logo.clearbit.com/discord.com",
+    spotify: "https://logo.clearbit.com/spotify.com",
+    zoom: "https://logo.clearbit.com/zoom.us",
+    steam: "https://logo.clearbit.com/steampowered.com",
+    nvidia: "https://logo.clearbit.com/nvidia.com",
+    vlc: "https://logo.clearbit.com/videolan.org"
 };
 
 export const REALISTIC_SOFTWARE_TRENDS: TrendingTopic[] = [

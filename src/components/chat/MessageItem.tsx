@@ -238,9 +238,34 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
             return null;
         }
 
+        // Logic to extract logo for single-item recommendations
+        let logoUrl = '';
+        if (mainDownloadChunk) {
+            try {
+                const hostname = new URL(mainDownloadChunk.web.uri).hostname;
+                logoUrl = `https://logo.clearbit.com/${hostname}`;
+            } catch (e) { }
+        }
+
         return (
-            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-300 dark:border-gray-600">
-                {icon}
+            <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-300 dark:border-gray-600">
+                {logoUrl ? (
+                    <div className="w-10 h-10 bg-white rounded-lg shadow-sm p-1 flex items-center justify-center flex-shrink-0">
+                        <img
+                            src={logoUrl}
+                            alt={`${title} logo`}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                // Maybe show fallback icon if logo fails
+                            }}
+                        />
+                    </div>
+                ) : (
+                    <div className="w-8 h-8 flex items-center justify-center">
+                        {icon}
+                    </div>
+                )}
                 {secondaryIcon}
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             </div>
