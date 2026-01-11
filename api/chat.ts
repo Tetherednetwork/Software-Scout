@@ -303,8 +303,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         } else {
 
             // Check for "Top X" or "Trend" intent via simple keyword check first to save LLM tokens or specifically guide it
-            if (userText.toLowerCase().includes('top') || userText.toLowerCase().includes('best') || userText.toLowerCase().includes('trend')) {
-                if (userText.toLowerCase().includes('antivirus')) {
+            if (lastUserMessage.text.toLowerCase().includes('top') || lastUserMessage.text.toLowerCase().includes('best') || lastUserMessage.text.toLowerCase().includes('trend')) {
+                if (lastUserMessage.text.toLowerCase().includes('antivirus')) {
                     const antivirusList = [
                         { name: "Norton 360", description: "Comprehensive protection with VPN.", url: "https://us.norton.com/", logo: "https://logo.clearbit.com/norton.com" },
                         { name: "Bitdefender", description: "Top-rated threat detection.", url: "https://www.bitdefender.com/", logo: "https://logo.clearbit.com/bitdefender.com" },

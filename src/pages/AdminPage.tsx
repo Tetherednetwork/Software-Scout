@@ -105,17 +105,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ session, onUserDataChange 
         await handleSuccess();
     };
 
-    const handleSoftwareDelete = async (id: string | number) => {
-        if (window.confirm('Are you sure you want to delete this software entry?')) {
-            try {
-                await adminService.deleteSoftware(id);
-                await loadData();
-            } catch (err: any) {
-                setError(`Failed to delete software: ${err.message}`);
-                alert(`Error: Could not delete software. Reason: ${err.message}`);
-            }
-        }
-    };
+
 
     const handlePostSave = async (post: Partial<BlogPost>) => {
         if (!session) return;
