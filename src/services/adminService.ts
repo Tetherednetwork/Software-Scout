@@ -236,11 +236,12 @@ export async function getPendingForumPosts(): Promise<ForumPost[]> {
     try {
         const q = query(
             collection(db, 'forum_posts'),
-            where('status', '==', 'pending'),
-            orderBy('created_at', 'asc')
+            where('status', '==', 'pending')
         );
         const snap = await getDocs(q);
-        const posts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as unknown as ForumPost));
+        const posts = snap.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as unknown as ForumPost))
+            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
         const userIds = posts.map(p => p.user_id);
         const profilesMap = await getProfilesMap(userIds);
