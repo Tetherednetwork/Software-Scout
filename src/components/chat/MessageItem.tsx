@@ -243,7 +243,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
         if (mainDownloadChunk) {
             try {
                 const hostname = new URL(mainDownloadChunk.web.uri).hostname;
-                logoUrl = `https://logo.clearbit.com/${hostname}`;
+                logoUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
             } catch (e) { }
         }
 

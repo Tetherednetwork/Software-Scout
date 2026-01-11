@@ -1,32 +1,38 @@
-
-import type { TrendingTopic } from '../types';
+export const getLogoUrl = (domain: string) => {
+    // Google's favicon service is the most reliable fallback.
+    // We request a large size (128px) to get high quality icons where available.
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+}
 
 // SVGs as Data URIs/URLs for instant loading/caching
+// Switched to Google's Favicon service as primary for reliability (Clearbit was 404ing)
 const LOGOS = {
     // Startups / New Tools
-    arc: "https://logo.clearbit.com/arc.net",
-    notion: "https://logo.clearbit.com/notion.so",
-    figma: "https://logo.clearbit.com/figma.com",
-    openai: "https://logo.clearbit.com/openai.com",
-    perplexity: "https://logo.clearbit.com/perplexity.ai",
+    arc: getLogoUrl("arc.net"),
+    notion: getLogoUrl("notion.so"),
+    figma: getLogoUrl("figma.com"),
+    openai: getLogoUrl("openai.com"),
+    perplexity: getLogoUrl("perplexity.ai"),
 
     // Antivirus
-    mcafee: "https://logo.clearbit.com/mcafee.com",
-    norton: "https://logo.clearbit.com/norton.com",
-    bitdefender: "https://logo.clearbit.com/bitdefender.com",
-    avast: "https://logo.clearbit.com/avast.com",
-    totalav: "https://logo.clearbit.com/totalav.com",
+    mcafee: getLogoUrl("mcafee.com"),
+    norton: getLogoUrl("norton.com"),
+    bitdefender: getLogoUrl("bitdefender.com"),
+    avast: getLogoUrl("avast.com"),
+    totalav: getLogoUrl("totalav.com"),
 
     // Others
-    chrome: "https://logo.clearbit.com/google.com",
-    vscode: "https://logo.clearbit.com/code.visualstudio.com",
-    discord: "https://logo.clearbit.com/discord.com",
-    spotify: "https://logo.clearbit.com/spotify.com",
-    zoom: "https://logo.clearbit.com/zoom.us",
-    steam: "https://logo.clearbit.com/steampowered.com",
-    nvidia: "https://logo.clearbit.com/nvidia.com",
-    vlc: "https://logo.clearbit.com/videolan.org"
+    chrome: getLogoUrl("google.com"),
+    vscode: getLogoUrl("code.visualstudio.com"),
+    discord: getLogoUrl("discord.com"),
+    spotify: getLogoUrl("spotify.com"),
+    zoom: getLogoUrl("zoom.us"),
+    steam: getLogoUrl("steampowered.com"),
+    nvidia: getLogoUrl("nvidia.com"),
+    vlc: getLogoUrl("videolan.org")
 };
+
+import type { TrendingTopic } from '../types';
 
 export const REALISTIC_SOFTWARE_TRENDS: TrendingTopic[] = [
     {
@@ -61,8 +67,7 @@ export const REALISTIC_SOFTWARE_TRENDS: TrendingTopic[] = [
         name: "Perplexity AI",
         description: "Where knowledge begins.",
         companyDomain: "perplexity.ai",
-        // Using a generic or best-effort logo if specific SVG not stable
-        logo: "https://upload.wikimedia.org/wikipedia/commons/7/77/Perplexity.ai_logo.svg",
+        logo: LOGOS.perplexity,
         trend_reason: "Search engine of the future."
     }
 ];
