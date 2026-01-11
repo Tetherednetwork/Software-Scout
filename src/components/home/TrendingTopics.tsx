@@ -49,7 +49,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                     </span>
-                    <h3 className="font-bold text-gray-800 dark:text-white">Software Trends</h3>
+                    <h3 className="font-bold text-gray-800 dark:text-white">Startup Trends</h3>
                 </div>
                 <button
                     onClick={fetchTrends}

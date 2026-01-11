@@ -31,7 +31,7 @@ const TopAntivirus: React.FC<TopAntivirusProps> = ({ onTopicClick }) => {
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <VirusScanIcon />
-                    <h3 className="font-bold text-gray-800 dark:text-white">Top Antivirus 2025</h3>
+                    <h3 className="font-bold text-gray-800 dark:text-white">Top Antivirus 2026</h3>
                 </div>
             </div>
             <div className="p-2 space-y-1 overflow-y-auto">

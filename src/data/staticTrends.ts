@@ -1,16 +1,14 @@
 
 import type { TrendingTopic } from '../types';
 
-// SVGs as Data URIs for instant loading/caching
+// SVGs as Data URIs/URLs for instant loading/caching
 const LOGOS = {
-    chrome: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg",
-    vscode: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg",
-    discord: "https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png",
-    spotify: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
-    zoom: "https://upload.wikimedia.org/wikipedia/commons/2/25/Zoom_communications_Logo.svg",
-    steam: "https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg",
-    nvidia: "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo_2024.svg",
-    vlc: "https://upload.wikimedia.org/wikipedia/commons/e/e6/VLC_Icon.svg",
+    // Startups / New Tools
+    arc: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Arc_Browser_logo.svg",
+    notion: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg",
+    figma: "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg",
+    openai: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
+    perplexity: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Perplexity_AI_logo.svg", // Fallback or find specific
 
     // Antivirus
     mcafee: "https://upload.wikimedia.org/wikipedia/commons/2/2f/McAfee_Shield_Logo.svg",
@@ -22,74 +20,40 @@ const LOGOS = {
 
 export const REALISTIC_SOFTWARE_TRENDS: TrendingTopic[] = [
     {
-        name: "Google Chrome",
-        description: "Top-rated for productivity.",
-        companyDomain: "google.com",
-        logo: LOGOS.chrome,
-        trend_reason: "Browsing standard. Most downloaded browser."
+        name: "Arc Browser",
+        description: "The browser that browses for you.",
+        companyDomain: "arc.net",
+        logo: LOGOS.arc,
+        trend_reason: "#1 Product on Product Hunt."
     },
     {
-        name: "Visual Studio Code",
-        description: "Essential utility for developers.",
-        companyDomain: "code.visualstudio.com",
-        logo: LOGOS.vscode,
-        trend_reason: "Trending in developer communities."
+        name: "Notion",
+        description: "Your connected workspace.",
+        companyDomain: "notion.so",
+        logo: LOGOS.notion,
+        trend_reason: "New AI features released."
     },
     {
-        name: "Spotify",
-        description: "Music for everyone.",
-        companyDomain: "spotify.com",
-        logo: LOGOS.spotify,
-        trend_reason: "Top music streaming app globally."
+        name: "Figma",
+        description: "The collaborative interface design tool.",
+        companyDomain: "figma.com",
+        logo: LOGOS.figma,
+        trend_reason: "Trending for designers."
     },
     {
-        name: "Discord",
-        description: "Talk, chat, and hang out.",
-        companyDomain: "discord.com",
-        logo: LOGOS.discord,
-        trend_reason: "Leading communication platform."
+        name: "OpenAI ChatGPT",
+        description: "AI that helps you write, learn, and create.",
+        companyDomain: "openai.com",
+        logo: LOGOS.openai,
+        trend_reason: "Viral AI sensation."
     },
     {
-        name: "Zoom Workplace",
-        description: "Video conferencing made easy.",
-        companyDomain: "zoom.us",
-        logo: LOGOS.zoom,
-        trend_reason: "Essential for remote work."
-    },
-    {
-        name: "Microsoft Teams",
-        description: "Collaborate with your team.",
-        companyDomain: "microsoft.com",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg",
-        trend_reason: "Widely used in enterprise."
-    },
-    {
-        name: "OBS Studio",
-        description: "Open source streaming software.",
-        companyDomain: "obsproject.com",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/OBS_Studio_Logo.svg",
-        trend_reason: "Top choice for streamers."
-    },
-    {
-        name: "Mozilla Firefox",
-        description: "Fast, private browser.",
-        companyDomain: "mozilla.org",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg",
-        trend_reason: "Privacy-focused alternative."
-    },
-    {
-        name: "Blender",
-        description: "Free 3D creation suite.",
-        companyDomain: "blender.org",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Blender_logo_no_text.svg",
-        trend_reason: "Major update released."
-    },
-    {
-        name: "Slack",
-        description: "Where work happens.",
-        companyDomain: "slack.com",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg",
-        trend_reason: "Communication standard."
+        name: "Perplexity AI",
+        description: "Where knowledge begins.",
+        companyDomain: "perplexity.ai",
+        // Using a generic or best-effort logo if specific SVG not stable
+        logo: "https://upload.wikimedia.org/wikipedia/commons/7/77/Perplexity.ai_logo.svg",
+        trend_reason: "Search engine of the future."
     }
 ];
 
