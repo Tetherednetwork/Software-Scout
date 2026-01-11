@@ -14,9 +14,11 @@ service cloud.firestore {
 
     function isAdmin() {
       // Global Admin Hardcoded + Database Role Check
+      // Use efficient short-circuiting and safety checks
       return isAuthenticated() && (
          request.auth.token.email == 'folarin.gbenga@gmail.com' || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
     }
 
