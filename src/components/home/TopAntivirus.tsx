@@ -8,36 +8,37 @@ interface TopAntivirusProps {
 
 // FIX: Corrected the type definition for antivirusTrends. The previous type was complex and incorrect due to operator precedence.
 // The objects in the array perfectly match the TrendingTopic interface.
-{
-    name: 'McAfee Total Protection',
+const antivirusTrends: TrendingTopic[] = [
+    {
+        name: 'McAfee Total Protection',
         description: 'Antivirus, identity and privacy protection.',
-            companyDomain: 'mcafee.com',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/McAfee_Shield_Logo.svg'
-},
-{
-    name: 'Norton 360 Deluxe',
+        companyDomain: 'mcafee.com',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/McAfee_Shield_Logo.svg'
+    },
+    {
+        name: 'Norton 360 Deluxe',
         description: 'Comprehensive security with VPN & more.',
-            companyDomain: 'norton.com',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Norton_AntiVirus_logo.png'
-},
-{
-    name: 'TotalAV',
+        companyDomain: 'norton.com',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Norton_AntiVirus_logo.png'
+    },
+    {
+        name: 'TotalAV',
         description: 'Award-winning antivirus & security suite.',
-            companyDomain: 'totalav.com',
-                logo: 'https://www.totalav.com/static/images/logo.svg'
-},
-{
-    name: 'Bitdefender Total Security',
+        companyDomain: 'totalav.com',
+        logo: 'https://www.totalav.com/static/images/logo.svg'
+    },
+    {
+        name: 'Bitdefender Total Security',
         description: 'Top-rated protection against all threats.',
-            companyDomain: 'bitdefender.com',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Bitdefender_Antivirus_Logo.svg' // Correct visual
-},
-{
-    name: 'Avast One',
+        companyDomain: 'bitdefender.com',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Bitdefender_Antivirus_Logo.svg' // Correct visual
+    },
+    {
+        name: 'Avast One',
         description: 'Free antivirus with privacy features.',
-            companyDomain: 'avast.com',
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Avast_Antivirus_logo.svg'
-},
+        companyDomain: 'avast.com',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Avast_Antivirus_logo.svg'
+    },
 ];
 
 
