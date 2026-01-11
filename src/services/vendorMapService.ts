@@ -57,7 +57,7 @@ export async function getVendorMap(): Promise<Vendor[]> {
                 mac: d.os_compatibility && d.os_compatibility.some(os => os.includes('macOS')) ? d.download_pattern : null,
                 linux: d.os_compatibility && d.os_compatibility.some(os => os.includes('Linux')) ? d.download_pattern : null,
                 android: d.os_compatibility && d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null,
-                logo: d.logo || undefined
+                logo: d.logo || FALLBACK_VENDORS.find(fv => fv.name === d.name)?.logo || undefined
             } as Vendor);
         });
 
