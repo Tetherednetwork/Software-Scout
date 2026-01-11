@@ -55,6 +55,41 @@ export const REALISTIC_SOFTWARE_TRENDS: TrendingTopic[] = [
         companyDomain: "zoom.us",
         logo: LOGOS.zoom,
         trend_reason: "Essential for remote work."
+    },
+    {
+        name: "Microsoft Teams",
+        description: "Collaborate with your team.",
+        companyDomain: "microsoft.com",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg",
+        trend_reason: "Widely used in enterprise."
+    },
+    {
+        name: "OBS Studio",
+        description: "Open source streaming software.",
+        companyDomain: "obsproject.com",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/d/d3/OBS_Studio_Logo.svg",
+        trend_reason: "Top choice for streamers."
+    },
+    {
+        name: "Mozilla Firefox",
+        description: "Fast, private browser.",
+        companyDomain: "mozilla.org",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg",
+        trend_reason: "Privacy-focused alternative."
+    },
+    {
+        name: "Blender",
+        description: "Free 3D creation suite.",
+        companyDomain: "blender.org",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Blender_logo_no_text.svg",
+        trend_reason: "Major update released."
+    },
+    {
+        name: "Slack",
+        description: "Where work happens.",
+        companyDomain: "slack.com",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg",
+        trend_reason: "Communication standard."
     }
 ];
 
