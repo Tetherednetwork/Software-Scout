@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { TrendingTopic } from '../../types';
-import { getVendorMap, type Vendor } from '../../services/vendorMapService';
+import { REALISTIC_SOFTWARE_TRENDS } from '../../data/staticTrends';
 
 interface TrendingTopicsProps {
     onTopicClick: (topic: string) => void;
@@ -11,71 +11,22 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchTrends = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const vendorMap: Vendor[] = await getVendorMap();
-
-            if (!vendorMap || vendorMap.length === 0) {
-                throw new Error("Could not load software map for trends.");
-            }
-
-            // Shuffle the array to get random trends
-            const shuffled = vendorMap.sort(() => 0.5 - Math.random());
-            const selected = shuffled.slice(0, 5);
-
-            const plausibleDescriptions = [
-                "A popular choice for professionals.",
-                "Powerful tool for creative tasks.",
-                "Essential utility for developers.",
-                "Top-rated for productivity.",
-                "A lightweight and fast solution.",
-                "Gaining traction in the community.",
-            ];
-
-            const plausibleReasons = [
-                "Up this week. Strong growth on Google Trends.",
-                "New major release on GitHub.",
-                "Featured on Product Hunt this week.",
-                "Trending in developer communities.",
-                "High download volume reported.",
-                "Positive reviews from tech critics."
-            ];
-
-            const formattedData: TrendingTopic[] = selected.map(item => {
-                let domain = '';
-                try {
-                    domain = new URL(item.homepage).hostname.replace(/^www\./, '');
-                } catch {
-                    // Fallback for invalid URLs or items without slug
-                    const nameParts = item.name.split(' ');
-                    domain = (nameParts[0] + (nameParts[1] || '')).toLowerCase() + '.com';
-                }
-
-                return {
-                    name: item.name,
-                    // Pick a random description and reason
-                    description: plausibleDescriptions[Math.floor(Math.random() * plausibleDescriptions.length)],
-                    companyDomain: domain,
-                    logo: item.logo,
-                    trend_reason: plausibleReasons[Math.floor(Math.random() * plausibleReasons.length)],
-                };
-            });
-
-            setTrends(formattedData);
-
-        } catch (err: any) {
-            console.error("Error fetching trending topics:", err);
-            setError(err.message || "Could not load trends.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchTrends();
+        // Simulate a very brief load or just set immediately
+        // We use the static realistic trends for speed and quality
+        setTrends(REALISTIC_SOFTWARE_TRENDS);
+        setIsLoading(false);
     }, []);
+
+    // Function kept for the refresh button, but now it just re-sets the static list (or we could shuffle)
+    const fetchTrends = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            // Optional: Shuffle slightly or just reload
+            setTrends([...REALISTIC_SOFTWARE_TRENDS].sort(() => 0.5 - Math.random()));
+            setIsLoading(false);
+        }, 500);
+    };
 
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
