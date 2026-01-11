@@ -9,7 +9,6 @@ interface TrendingTopicsProps {
 const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
     const [trends, setTrends] = useState<TrendingTopic[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         // Simulate a very brief load or just set immediately
@@ -72,8 +71,6 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                             </div>
                         </div>
                     ))
-                ) : error ? (
-                    <p className="p-4 text-center text-sm text-red-500 dark:text-red-400">{error}</p>
                 ) : trends.length > 0 ? trends.map((item) => (
                     <button
                         key={item.name}
