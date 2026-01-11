@@ -18,7 +18,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
             const vendorMap: Vendor[] = await getVendorMap();
 
             if (!vendorMap || vendorMap.length === 0) {
-                 throw new Error("Could not load software map for trends.");
+                throw new Error("Could not load software map for trends.");
             }
 
             // Shuffle the array to get random trends
@@ -52,12 +52,13 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                     const nameParts = item.name.split(' ');
                     domain = (nameParts[0] + (nameParts[1] || '')).toLowerCase() + '.com';
                 }
-                
+
                 return {
                     name: item.name,
                     // Pick a random description and reason
                     description: plausibleDescriptions[Math.floor(Math.random() * plausibleDescriptions.length)],
                     companyDomain: domain,
+                    logo: item.logo,
                     trend_reason: plausibleReasons[Math.floor(Math.random() * plausibleReasons.length)],
                 };
             });
@@ -71,7 +72,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
             setIsLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchTrends();
     }, []);
@@ -83,11 +84,11 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
         // Fallback to an initial-based avatar
         target.src = `${import.meta.env.VITE_DICEBEAR_API_URL}/initials/svg?seed=${encodeURIComponent(trendName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&chars=2&radius=20`;
         // Prevent retrying the same failed URL
-        target.onerror = null; 
+        target.onerror = null;
     };
 
     return (
-        <div 
+        <div
             className="w-full flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
             data-tour-id="trending-topics"
         >
@@ -99,7 +100,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                     </span>
                     <h3 className="font-bold text-gray-800 dark:text-white">Software Trends</h3>
                 </div>
-                 <button
+                <button
                     onClick={fetchTrends}
                     disabled={isLoading}
                     className="p-1.5 text-gray-500 dark:text-white rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-wait transition-colors"
@@ -110,7 +111,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                 </button>
             </div>
             <div className="p-2 space-y-1 overflow-y-auto">
-                 {isLoading ? (
+                {isLoading ? (
                     Array.from({ length: 5 }).map((_, index) => (
                         <div key={index} className="flex items-center gap-3 p-2 rounded-lg animate-pulse">
                             <div className="w-10 h-10 flex-shrink-0 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
@@ -120,18 +121,18 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                             </div>
                         </div>
                     ))
-                 ) : error ? (
+                ) : error ? (
                     <p className="p-4 text-center text-sm text-red-500 dark:text-red-400">{error}</p>
-                 ) : trends.length > 0 ? trends.map((item) => (
+                ) : trends.length > 0 ? trends.map((item) => (
                     <button
                         key={item.name}
                         onClick={() => onTopicClick(item.name)}
                         className="w-full text-left flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-green-500"
                     >
                         <div className="w-10 h-10 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg p-1.5 flex items-center justify-center">
-                            <img 
-                                src={`https://logo.clearbit.com/${item.companyDomain}`} 
-                                alt={`${item.name} logo`} 
+                            <img
+                                src={item.logo || `https://logo.clearbit.com/${item.companyDomain}`}
+                                alt={`${item.name} logo`}
                                 className="max-w-full max-h-full object-contain"
                                 onError={handleImageError}
                             />
@@ -147,7 +148,7 @@ const TrendingTopics: React.FC<TrendingTopicsProps> = ({ onTopicClick }) => {
                         </div>
                     </button>
                 )) : (
-                     <p className="p-4 text-center text-sm text-gray-500 dark:text-white">No trends available right now.</p>
+                    <p className="p-4 text-center text-sm text-gray-500 dark:text-white">No trends available right now.</p>
                 )}
             </div>
         </div>

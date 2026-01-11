@@ -70,6 +70,7 @@ export interface TrendingTopic {
   name: string;
   description: string;
   companyDomain: string;
+  logo?: string;
   trend_reason?: string;
 }
 
@@ -267,4 +268,5 @@ export interface SoftwareCatalogItem {
   download_pattern: string;
   verified: boolean;
   manufacturer: string;
+  logo?: string;
 }

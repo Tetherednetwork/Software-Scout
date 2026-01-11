@@ -8,19 +8,23 @@ export interface Vendor {
     homepage: string;
     windows: string | null;
     mac: string | null;
-    linux?: string | null;
     android?: string | null;
+    logo?: string;
     [key: string]: string | null | undefined;
 }
 
 // --- FALLBACK KNOWLEDGE (Client-side Safety Net) ---
 const FALLBACK_VENDORS = [
-    { "name": "NVIDIA GeForce Driver", "homepage": "https://www.nvidia.com", "windows": "https://www.nvidia.com" },
-    { "name": "Google Chrome", "homepage": "https://www.google.com/chrome", "windows": "https://www.google.com/chrome" },
-    { "name": "VLC Media Player", "homepage": "https://www.videolan.org/vlc", "windows": "https://www.videolan.org/vlc" },
-    { "name": "Steam", "homepage": "https://store.steampowered.com", "windows": "https://store.steampowered.com" },
-    { "name": "Visual Studio Code", "homepage": "https://code.visualstudio.com", "windows": "https://code.visualstudio.com" },
-    { "name": "Discord", "homepage": "https://discord.com", "windows": "https://discord.com" }
+    { "name": "NVIDIA GeForce Driver", "homepage": "https://www.nvidia.com", "windows": "https://www.nvidia.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo_2024.svg" },
+    { "name": "Google Chrome", "homepage": "https://www.google.com/chrome", "windows": "https://www.google.com/chrome", "logo": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" },
+    { "name": "VLC Media Player", "homepage": "https://www.videolan.org/vlc", "windows": "https://www.videolan.org/vlc", "logo": "https://upload.wikimedia.org/wikipedia/commons/e/e6/VLC_Icon.svg" },
+    { "name": "Steam", "homepage": "https://store.steampowered.com", "windows": "https://store.steampowered.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" },
+    { "name": "Visual Studio Code", "homepage": "https://code.visualstudio.com", "windows": "https://code.visualstudio.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg" },
+    { "name": "Discord", "homepage": "https://discord.com", "windows": "https://discord.com", "logo": "https://assets-global.website-files.com/6257adef93867e56f84d3092/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" },
+    { "name": "DirectX End-User Runtime Web Installer", "homepage": "https://www.microsoft.com/en-us/download/details.aspx?id=35", "windows": "https://www.microsoft.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/a/a2/DirectX_logo.svg" },
+    { "name": "HP Drivers Support", "homepage": "https://support.hp.com", "windows": "https://support.hp.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg" },
+    { "name": "AMD Software: Adrenalin Edition", "homepage": "https://www.amd.com", "windows": "https://www.amd.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg" },
+    { "name": "Intel Graphics Driver", "homepage": "https://www.intel.com", "windows": "https://www.intel.com", "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Intel_logo_%282020%2C_dark_blue%29.svg" }
 ];
 
 // Cache the vendor map in memory to avoid repeated DB calls
@@ -52,7 +56,8 @@ export async function getVendorMap(): Promise<Vendor[]> {
                 windows: d.os_compatibility && d.os_compatibility.some(os => os.includes('Windows')) ? d.download_pattern : null,
                 mac: d.os_compatibility && d.os_compatibility.some(os => os.includes('macOS')) ? d.download_pattern : null,
                 linux: d.os_compatibility && d.os_compatibility.some(os => os.includes('Linux')) ? d.download_pattern : null,
-                android: d.os_compatibility && d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null
+                android: d.os_compatibility && d.os_compatibility.some(os => os.includes('Android')) ? d.download_pattern : null,
+                logo: d.logo || undefined
             } as Vendor);
         });
 
