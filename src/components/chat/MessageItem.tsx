@@ -252,26 +252,28 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
         }
 
         return (
-            <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-gray-300 dark:border-gray-600">
+                <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+                    {secondaryIcon}
+                </div>
+
                 {logoUrl ? (
-                    <div className="w-10 h-10 bg-white rounded-lg shadow-sm p-1 flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-white rounded-lg shadow-sm p-1.5 flex items-center justify-center flex-shrink-0 border border-gray-100">
                         <img
                             src={logoUrl}
                             alt={`${title} logo`}
                             className="w-full h-full object-contain"
                             onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
-                                // Maybe show fallback icon if logo fails
                             }}
                         />
                     </div>
                 ) : (
-                    <div className="w-8 h-8 flex items-center justify-center">
+                    <div className="w-10 h-10 flex items-center justify-center text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
                         {icon}
                     </div>
                 )}
-                {secondaryIcon}
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             </div>
         );
     };
