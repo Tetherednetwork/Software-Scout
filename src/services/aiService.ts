@@ -31,6 +31,8 @@ export const findSoftware = async (
     const lastBotMessage = [...historyCopy].reverse().find((m: Message) => m.sender === 'bot');
 
     // --- START: Client-side pre-processing logic for better UX ---
+    // We will capture any verified URL found during this phase to ensure it's returned to the UI
+    let verifiedPreDetectedUrl: string | undefined;
 
     // A. Handle response to a platform selection prompt
     if (lastBotMessage?.type === 'platform-prompt') {
@@ -45,6 +47,7 @@ export const findSoftware = async (
                 const urlKey = platform === 'macos' ? 'mac' : platform;
                 const url = software[urlKey as keyof typeof software];
                 if (url) {
+                    verifiedPreDetectedUrl = url;
                     const context = `[CONTEXT: A verified link for "${software.name}" for ${platform} was found: ${url}. You MUST use this as the official source. Do not search for another link.]`;
                     lastUserMessage.text = `${context}\n\nOriginal request: "${originalRequestMessage.text}"`;
                     // Now let it fall through to the backend call with the new context
@@ -95,6 +98,7 @@ export const findSoftware = async (
                 const urlKey = platform === 'macos' ? 'mac' : platform;
                 const url = singleMatch[urlKey as keyof typeof singleMatch];
                 if (url) {
+                    verifiedPreDetectedUrl = url;
                     const context = `[CONTEXT: A verified link for "${singleMatch.name}" for ${platform} was found: ${url}. You MUST use this as the official source. Do not search for another link.]`;
                     lastUserMessage.text = `${context}\n\nOriginal request: "${lastUserMessage.text}"`;
                 }
@@ -112,16 +116,16 @@ export const findSoftware = async (
                 }
             }
         }
-        // D. If it's a new query for drivers and the user is logged in, check for saved devices
-        else if (session) {
-            const lowerCaseText = lastUserMessage.text.toLowerCase();
-            const requestKeywords = ['driver', 'drivers'];
-            if (requestKeywords.some(keyword => lowerCaseText.includes(keyword))) {
-                const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
-                const snapshot = await getDocs(q);
-                if (!snapshot.empty) {
-                    return { text: "I see you have some saved devices. Are you searching for one of them?\n[OPTIONS]: Yes, for a saved device; No, for something else", type: 'driver-device-prompt' };
-                }
+    }
+    // D. If it's a new query for drivers... (rest of the code unchanged)
+    else if (session && isNewQuery) { // Added isNewQuery check to D to match logic structure
+        const lowerCaseText = lastUserMessage.text.toLowerCase();
+        const requestKeywords = ['driver', 'drivers'];
+        if (requestKeywords.some(keyword => lowerCaseText.includes(keyword))) {
+            const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+                return { text: "I see you have some saved devices. Are you searching for one of them?\n[OPTIONS]: Yes, for a saved device; No, for something else", type: 'driver-device-prompt' };
             }
         }
     }
@@ -177,8 +181,32 @@ export const findSoftware = async (
             throw new Error(errData.error || `HTTP error ${response.status}`);
         }
 
-        const data = await response.json();
-        return data as BotResponse;
+        const data: BotResponse = await response.json();
+
+        // Post-processing: Inject verified URL if AI didn't return one (or even if it did, ours is safer)
+        if (verifiedPreDetectedUrl) {
+            if (!data.groundingChunks) data.groundingChunks = [];
+
+            // Check if this URL is already there to avoid duplicates
+            const alreadyExists = data.groundingChunks.some(chunk => chunk.web.uri === verifiedPreDetectedUrl);
+
+            if (!alreadyExists) {
+                data.groundingChunks.unshift({
+                    web: {
+                        uri: verifiedPreDetectedUrl,
+                        title: "Official Verified Source"
+                    }
+                });
+            }
+
+            // Force type to software to ensure UI handles it with maximum feature set (like the Yes/No prompts if applicable)
+            // specific types like 'driver' or 'game' should probably remain if AI set them, but for 'standard' we upgrade.
+            if (data.type === 'standard') {
+                data.type = 'software';
+            }
+        }
+
+        return data;
 
     } catch (error: any) {
         console.error("AI Service Error:", error);
