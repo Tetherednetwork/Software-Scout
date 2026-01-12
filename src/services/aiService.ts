@@ -38,7 +38,8 @@ export const findSoftware = async (
     if (lastBotMessage?.type === 'platform-prompt') {
         const platform = detectPlatform(lastUserMessage.text);
         const originalRequestMessage = historyCopy.filter((m: Message) => m.sender === 'user').slice(-2, -1)[0];
-        const softwareNameMatch = lastBotMessage.text.match(/I found "(.*?)"/);
+        // Match both "I found" (direct) and "Great! For" (clarified) patterns
+        const softwareNameMatch = lastBotMessage.text.match(/(?:I found|Great! For) "(.*?)"/);
         if (platform && originalRequestMessage && softwareNameMatch) {
             const softwareName = softwareNameMatch[1];
             const foundSoftwareList = await findInVendorMap(softwareName);
