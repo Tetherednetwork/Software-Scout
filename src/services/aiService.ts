@@ -1,7 +1,7 @@
 import { db } from './firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import type { Message, SoftwareFilter, Session, GroundingChunk, Platform, UserDevice } from '../types';
+import type { Message, SoftwareFilter, Session, GroundingChunk, Platform, SavedDevice } from '../types';
 import { findInVendorMap, detectPlatform } from './vendorMapService';
+import { dbService } from './dbService';
 
 export interface BotResponse {
     text: string;
@@ -118,43 +118,73 @@ export const findSoftware = async (
             }
         }
     }
-    // D. If it's a new query for drivers... (rest of the code unchanged)
-    else if (session && isNewQuery) { // Added isNewQuery check to D to match logic structure
+    // D. Check for Drivers + Saved Device Context match
+    // Only verify if we haven't already just finished a prompt
+    const isPromptResponse = lastBotMessage && ['driver-input-prompt', 'driver-device-prompt', 'driver-device-selection'].includes(lastBotMessage.type || '');
+
+    if (session && !isPromptResponse && isNewQuery) {
         const lowerCaseText = lastUserMessage.text.toLowerCase();
-        const requestKeywords = ['driver', 'drivers'];
-        if (requestKeywords.some(keyword => lowerCaseText.includes(keyword))) {
-            const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                return { text: "I see you have some saved devices. Are you searching for one of them?\n[OPTIONS]: Yes, for a saved device; No, for something else", type: 'driver-device-prompt' };
+        // Driver intent detection
+        const driverKeywords = ['driver', 'drivers', 'bios', 'firmware', 'update'];
+        if (driverKeywords.some(keyword => lowerCaseText.includes(keyword))) {
+            // Use dbService for consistency
+            const { data: devices } = await dbService.getUserDevices(session.user.id);
+            if (devices && devices.length > 0) {
+                return {
+                    text: "I see you have saved devices in your profile. Is this request for one of them?",
+                    type: 'driver-device-prompt' // UI can render a Yes/No or Device Picker here
+                };
             }
         }
     }
 
     // E. Handle the saved device selection flow
-    if (session && lastUserMessage) {
-        if (lastUserMessage.text === 'Yes, for a saved device' && lastBotMessage?.type === 'driver-device-prompt') {
-            const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                const devices = snapshot.docs.map(d => d.data() as UserDevice);
-                const deviceOptions = devices.map(d => `${d.device_name} (${d.manufacturer} ${d.model})`).join(', ');
-                return { text: `Great! Which device is it for?\n[OPTIONS]: ${deviceOptions}`, type: 'driver-device-selection' };
+    if (session && lastUserMessage && lastBotMessage) {
+        // User answered "Yes" or selected "Saved Device" logic
+        // We assume the UI sends specific text or we treat "Yes" generally
+        if (lastBotMessage.type === 'driver-device-prompt') {
+            const text = lastUserMessage.text.toLowerCase();
+            if (text.includes('yes') || text.includes('saved device')) {
+                const { data: devices } = await dbService.getUserDevices(session.user.id);
+                if (devices && devices.length > 0) {
+                    const deviceOptions = devices.map(d => `${d.name} (${d.brand} ${d.model})`).join('; ');
+                    return {
+                        text: `Great! Which device is it for?\n[OPTIONS]: ${deviceOptions}`,
+                        type: 'driver-device-selection'
+                    };
+                }
             }
         }
 
-        if (lastBotMessage?.type === 'driver-device-selection') {
-            const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
-            const snapshot = await getDocs(q);
-            const devices = snapshot.docs.map(d => d.data() as UserDevice);
-            const selectedDevice = devices?.find((d: UserDevice) => lastUserMessage.text.startsWith(d.device_name));
+        // User picked a specific device
+        if (lastBotMessage.type === 'driver-device-selection') {
+            const { data: devices } = await dbService.getUserDevices(session.user.id);
+            const selectedDevice = devices?.find((d: SavedDevice) => lastUserMessage.text.includes(d.name) || lastUserMessage.text.includes(d.model));
 
             if (selectedDevice) {
-                const originalRequestMessage = historyCopy.findLast((m: Message) => m.sender === 'user' && m.type !== 'driver-device-selection' && m.text !== 'Yes, for a saved device');
+                // Find original request to append context
+                // We go back 2 user messages usually (1. Request, 2. "Yes", 3. "Device Name") - imprecise, better to search back.
+                const originalRequestMessage = [...historyCopy].reverse().find((m: Message) =>
+                    m.sender === 'user' &&
+                    !m.text.includes('Yes') &&
+                    !m.text.includes(selectedDevice.name) &&
+                    m.type !== 'driver-device-selection'
+                );
 
                 if (originalRequestMessage) {
-                    const context = `[CONTEXT: The user has selected their device: a ${selectedDevice.manufacturer} ${selectedDevice.model} running ${selectedDevice.os}.]`;
-                    lastUserMessage.text = `${context}\n\nBased on this context, please process my original request: "${originalRequestMessage.text}"`;
+                    // CRITICAL: Slot-Filling Injection
+                    const context = `
+[SYSTEM CONTEXT: The user selected a saved device.]
+Device: ${selectedDevice.brand} ${selectedDevice.model}
+OS: ${selectedDevice.os_family} ${selectedDevice.os_version || ''}
+Serial: ${selectedDevice.serial_number || 'Unknown'}
+
+TASK: Fulfill the user's driver request ("${originalRequestMessage.text}") for this specific device. 
+1. If you need the specific driver type (e.g. Wi-Fi vs Audio), ASK for it.
+2. If you have enough info, provide the verified download link immediately.
+3. If the driver requires a Serial Number and checking the portal, ask for it ONLY if missing.
+`;
+                    lastUserMessage.text = `${context}\n\nUser Selection: "${selectedDevice.name}"`;
                 }
             }
         }
