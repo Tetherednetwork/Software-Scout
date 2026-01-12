@@ -49,7 +49,19 @@ export interface DownloadHistoryItem {
   timestamp: string; // ISO string
   type: 'software' | 'driver' | 'game';
   platform?: Platform;
-  status?: 'verified' | 'failed';
+  status?: 'verified' | 'failed' | 'scanning' | 'warned' | 'quarantined' | 'blocked'; // Extended for state machine
+
+  // New State Machine Fields
+  riskStatus?: 'scanning' | 'verified' | 'warned' | 'quarantined' | 'blocked';
+  deviceRef?: string | null;
+  deviceSnapshot?: {
+    manufacturer: string | null;
+    model: string | null;
+    osFamily: string | null;
+    osVersion: string | null;
+  };
+  notes?: string;
+
   // DB fields
   user_id?: string;
 }

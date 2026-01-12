@@ -39,7 +39,7 @@ const DownloadHistoryModal: React.FC<DownloadHistoryModalProps> = ({ history, on
         });
     };
 
-    const StatusIndicator: React.FC<{ status?: 'verified' | 'failed' }> = ({ status }) => {
+    const StatusIndicator: React.FC<{ status?: 'verified' | 'failed' | 'scanning' | 'warned' | 'quarantined' | 'blocked' }> = ({ status }) => {
         if (!status) return null;
 
         if (status === 'verified') {
@@ -51,14 +51,39 @@ const DownloadHistoryModal: React.FC<DownloadHistoryModalProps> = ({ history, on
             );
         }
 
-        if (status === 'failed') {
+        if (status === 'failed' || status === 'blocked') {
             return (
                 <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400 font-medium bg-red-100 dark:bg-red-900/50 px-2 py-0.5 rounded-full">
                     <CloseCircleIcon className="h-4 w-4" />
-                    <span>Failed</span>
+                    <span>{status === 'blocked' ? 'Blocked' : 'Failed'}</span>
                 </div>
             );
         }
+
+        if (status === 'scanning') {
+            return (
+                <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-full">
+                    <span>Scanning...</span>
+                </div>
+            );
+        }
+
+        if (status === 'warned') {
+            return (
+                <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-100 dark:bg-yellow-900/50 px-2 py-0.5 rounded-full">
+                    <span>Warned</span>
+                </div>
+            );
+        }
+
+        if (status === 'quarantined') {
+            return (
+                <div className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-medium bg-orange-100 dark:bg-orange-900/50 px-2 py-0.5 rounded-full">
+                    <span>Quarantined</span>
+                </div>
+            );
+        }
+
 
         return null;
     };
