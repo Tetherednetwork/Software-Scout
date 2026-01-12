@@ -31,8 +31,9 @@ export interface Message {
   sender: 'user' | 'bot';
   groundingChunks?: GroundingChunk[];
   options?: string[];
-  type?: 'software' | 'driver' | 'game' | 'driver-input-prompt' | 'standard' | 'installation-guide' | 'software-list' | 'driver-device-prompt' | 'driver-device-selection' | 'platform-prompt' | 'software-clarification-prompt' | 'question';
+  type?: 'software' | 'driver' | 'game' | 'driver-input-prompt' | 'standard' | 'installation-guide' | 'software-list' | 'driver-device-prompt' | 'driver-device-selection' | 'platform-prompt' | 'software-clarification-prompt' | 'question' | 'save-device-prompt';
   platform?: Platform;
+  suggestedDevice?: Partial<SavedDevice>;
   // DB fields
   user_id?: string;
   created_at?: string;

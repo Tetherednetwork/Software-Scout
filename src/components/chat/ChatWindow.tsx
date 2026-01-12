@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import type { Message, SoftwareFilter, DownloadHistoryItem, Session } from '../../types';
+import type { Message, SoftwareFilter, DownloadHistoryItem, Session, SavedDevice } from '../../types';
 import { findSoftware } from '../../services/aiService';
 import MessageItem from './MessageItem';
 import ChatInput from './ChatInput';
@@ -105,11 +105,14 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
                 groundingChunks: botResponse.groundingChunks,
                 type: botResponse.type,
                 platform: botResponse.platform,
+                suggestedDevice: botResponse.suggestedDevice,
             };
             setMessages(prev => [...prev, botMessage]);
 
             // Save bot message to DB if user is logged in
             if (session) {
+                // Remove suggestedDevice before saving to DB as it's a transient UI hint
+                // Remove suggestedDevice before saving to DB as it's a transient UI hint
                 await dbService.addChatMessage(session.user.id, {
                     user_id: session.user.id,
                     text: botMessage.text,
@@ -216,6 +219,45 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
         }
     };
 
+    const handleUserSaveDevice = async (device: Partial<SavedDevice>) => {
+        if (!session) return;
+
+        // Ensure required fields exist
+        if (!device.name || !device.brand || !device.model) {
+            onShowToast("Could not save device: missing information.");
+            return;
+        }
+
+        const newDevice = {
+            name: `${device.brand} ${device.model}`, // Default name
+            type: 'other' as const, // Default type, user can edit later
+            brand: device.brand,
+            model: device.model,
+            os_family: device.os_family || 'Windows',
+            os_version: device.os_version || '',
+            serial_number: device.serial_number || '',
+            ...device // Spread to override defaults if present
+        };
+
+        const { error } = await dbService.addDevice(session.user.id, newDevice as any); // Cast as any because AddDevice might expect strict types
+
+        if (error) {
+            console.error("Error saving device:", error);
+            onShowToast("Failed to save device. Please try again.");
+        } else {
+            onShowToast(`Successfully saved ${newDevice.name}!`);
+            // Hide the prompt card optimistically
+            const currentMessages = [...messages];
+            const lastMsg = currentMessages[currentMessages.length - 1];
+            if (lastMsg && lastMsg.suggestedDevice) {
+                // We modify the message in state to remove the suggestion so it doesn't show again
+                const updatedLastMsg = { ...lastMsg, suggestedDevice: undefined };
+                currentMessages[currentMessages.length - 1] = updatedLastMsg;
+                setMessages(currentMessages);
+            }
+        }
+    };
+
     const latestBotMessageId = [...messages].reverse().find(m => m.sender === 'bot')?.id;
 
     return (
@@ -235,6 +277,7 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
                         isLatestBotMessage={!isLoading && msg.id === latestBotMessageId}
                         onDownload={onDownload}
                         userAvatarUrl={session?.user?.user_metadata?.custom_avatar_url || session?.user?.user_metadata?.avatar_url}
+                        onSaveDevice={handleUserSaveDevice}
                     />
                 ))}
 

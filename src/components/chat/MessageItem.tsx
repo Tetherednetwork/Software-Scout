@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { scanUrl, ScanResult } from '../../services/scannerService';
-import type { Message, DownloadHistoryItem, Platform } from '../../types';
+import type { Message, DownloadHistoryItem, Platform, SavedDevice } from '../../types';
 import { UserIcon, BotIcon, DownloadIcon, LinkIcon, SoftwareIcon, WrenchIcon, ShieldCheckIcon, YouTubeIcon, AppleIcon, LinuxIcon, AndroidIcon, GameIcon, WindowsIcon } from '../ui/Icons';
 
 interface MessageItemProps {
@@ -9,6 +9,7 @@ interface MessageItemProps {
     isLatestBotMessage: boolean;
     onDownload: (item: Omit<DownloadHistoryItem, 'id' | 'timestamp' | 'status'>) => void;
     userAvatarUrl?: string;
+    onSaveDevice?: (device: Partial<SavedDevice>) => void;
 }
 
 interface SoftwareListItem {
@@ -18,7 +19,7 @@ interface SoftwareListItem {
     logo?: string;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLatestBotMessage, onDownload, userAvatarUrl }) => {
+const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLatestBotMessage, onDownload, userAvatarUrl, onSaveDevice }) => {
     const { text, sender, groundingChunks, type, platform } = message;
     const isUser = sender === 'user';
     const messageBgClass = isUser
@@ -453,6 +454,43 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
                                 <YouTubeIcon className="h-6 w-6" />
                                 Watch Video
                             </a>
+                        </div>
+                    )}
+
+                    {message.suggestedDevice && isLatestBotMessage && onSaveDevice && (
+                        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-full text-blue-600 dark:text-blue-300">
+                                    <WrenchIcon />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-1">
+                                        Save this device?
+                                    </h4>
+                                    <p className="text-xs text-blue-800 dark:text-blue-200 mb-3 leading-relaxed">
+                                        We detected you are looking for drivers for your <strong>{message.suggestedDevice.brand} {message.suggestedDevice.model}</strong>.
+                                        Save it to your profile to skip these questions next time.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => onSaveDevice(message.suggestedDevice!)}
+                                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700 shadow-sm transition-colors"
+                                        >
+                                            Yes, save device
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const el = document.getElementById('save-device-card-' + message.id);
+                                                if (el) el.style.display = 'none';
+                                            }}
+                                            id={`save-device-card-${message.id}`}
+                                            className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            No thanks
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 

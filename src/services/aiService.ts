@@ -8,6 +8,7 @@ export interface BotResponse {
     groundingChunks?: GroundingChunk[];
     type: Message['type'];
     platform?: Platform;
+    suggestedDevice?: Partial<SavedDevice>;
 }
 
 /**
@@ -213,16 +214,56 @@ TASK: Fulfill the user's driver request ("${originalRequestMessage.text}") for t
         }
 
         const data: BotResponse = await response.json();
+        const rawText = data.text || ''; // Ensure text is string
+
+        let groundingChunks: GroundingChunk[] | undefined = data.groundingChunks;
+        let textForDisplay = rawText;
+        let suggestedDevice: Partial<SavedDevice> | undefined = undefined;
+
+        // 1. Parsing Links
+        const downloadLinkRegex = /\[DOWNLOAD_LINK\](https?:\/\/[^\[\]\s]+)\[\/DOWNLOAD_LINK\]/;
+        const downloadMatch = rawText.match(downloadLinkRegex);
+
+        const videoLinkRegex = /\[VIDEO_LINK\](https?:\/\/[^\[\]\s]+)\[\/VIDEO_LINK\]/;
+        const videoMatch = rawText.match(videoLinkRegex);
+
+        // 2. Parsing Detected Device Data (New Feature)
+        const deviceDataRegex = /\[DETECTED_DEVICE_DATA\](.*?)\[\/DETECTED_DEVICE_DATA\]/;
+        const deviceMatch = rawText.match(deviceDataRegex);
+
+        if (deviceMatch && deviceMatch[1]) {
+            try {
+                suggestedDevice = JSON.parse(deviceMatch[1]);
+                textForDisplay = textForDisplay.replace(deviceDataRegex, '').trim();
+            } catch (e) {
+                console.warn("Failed to parse detected device data:", e);
+            }
+        }
+
+        if (downloadMatch && downloadMatch[1]) {
+            const url = downloadMatch[1];
+            if (!groundingChunks) groundingChunks = [];
+            // Dedup
+            if (!groundingChunks.some(g => g.web.uri === url)) {
+                groundingChunks.unshift({ web: { uri: url, title: 'Official Source' } });
+            }
+            textForDisplay = textForDisplay.replace(downloadLinkRegex, '').trim();
+        } else if (videoMatch && videoMatch[1]) {
+            const url = videoMatch[1];
+            if (!groundingChunks) groundingChunks = [];
+            groundingChunks.push({ web: { uri: url, title: 'Video Guide' } });
+            textForDisplay = textForDisplay.replace(videoLinkRegex, '').trim();
+        }
 
         // Post-processing: Inject verified URL if AI didn't return one (or even if it did, ours is safer)
         if (verifiedPreDetectedUrl) {
-            if (!data.groundingChunks) data.groundingChunks = [];
+            if (!groundingChunks) groundingChunks = [];
 
             // Check if this URL is already there to avoid duplicates
-            const alreadyExists = data.groundingChunks.some(chunk => chunk.web.uri === verifiedPreDetectedUrl);
+            const alreadyExists = groundingChunks.some(chunk => chunk.web.uri === verifiedPreDetectedUrl);
 
             if (!alreadyExists) {
-                data.groundingChunks.unshift({
+                groundingChunks.unshift({
                     web: {
                         uri: verifiedPreDetectedUrl,
                         title: "Official Verified Source"
@@ -237,7 +278,13 @@ TASK: Fulfill the user's driver request ("${originalRequestMessage.text}") for t
             }
         }
 
-        return data;
+        // Return cleaned response with suggestedDevice
+        return {
+            ...data,
+            text: textForDisplay,
+            groundingChunks,
+            suggestedDevice
+        };
 
     } catch (error: any) {
         console.error("AI Service Error:", error);
