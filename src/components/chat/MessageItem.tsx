@@ -331,7 +331,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
         if (!scanResult) return null;
 
         const isSafe = scanResult.verdict === 'safe' || scanResult.verdict === 'unknown';
-        const colorClass = isSafe ? 'green' : (scanResult.verdict === 'blocked' ? 'red' : 'yellow');
+        const colorClass = isSafe ? 'green' : (scanResult.verdict === 'malicious' ? 'red' : 'yellow');
 
         return (
             <div className={`flex flex-col gap-1 bg-${colorClass}-50 dark:bg-${colorClass}-900/20 border border-${colorClass}-200 dark:border-${colorClass}-800 rounded-lg p-3 mb-4`}>
