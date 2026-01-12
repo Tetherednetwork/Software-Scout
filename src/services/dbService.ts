@@ -10,7 +10,7 @@ import {
     limit
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDevice, DownloadHistoryItem, SoftwareCatalogItem } from '../types';
+import type { SavedDevice, DownloadHistoryItem, SoftwareCatalogItem } from '../types';
 
 export const dbService = {
     // --- Devices ---
