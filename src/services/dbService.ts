@@ -18,9 +18,9 @@ export const dbService = {
         try {
             const q = query(collection(db, 'users', userId, 'devices'), orderBy('created_at', 'desc'));
             const querySnapshot = await getDocs(q);
-            const devices: UserDevice[] = [];
+            const devices: SavedDevice[] = [];
             querySnapshot.forEach((doc) => {
-                devices.push({ id: doc.id, ...doc.data() } as any); // Type assertion needed or clean mapping
+                devices.push({ id: doc.id, ...doc.data() } as any);
             });
             return { data: devices, error: null };
         } catch (error: any) {
@@ -28,35 +28,34 @@ export const dbService = {
         }
     },
 
-    addDevice: async (userId: string, device: Omit<UserDevice, 'id' | 'created_at' | 'user_id'>) => {
+    addDevice: async (userId: string, device: Omit<SavedDevice, 'id' | 'created_at' | 'updated_at'>) => {
         try {
-            // Check for duplicate name logic if needed (optional for MVP)
+            const timestamp = Date.now();
             const docRef = await addDoc(collection(db, 'users', userId, 'devices'), {
                 ...device,
-                user_id: userId,
-                created_at: new Date().toISOString()
+                created_at: timestamp,
+                updated_at: timestamp
             });
-            const newDevice = { id: docRef.id, ...device, user_id: userId, created_at: new Date().toISOString() };
+            const newDevice = { id: docRef.id, ...device, created_at: timestamp, updated_at: timestamp };
             return { data: newDevice, error: null };
         } catch (error: any) {
             return { data: null, error };
         }
     },
 
-    updateDevice: async (userId: string, device: Partial<UserDevice> & { id: string | number }) => {
+    updateDevice: async (userId: string, device: Partial<SavedDevice> & { id: string }) => {
         try {
-            // Ensure ID is string for Firestore. If number, we might have legacy issue, but let's assume we map it.
             const deviceId = String(device.id);
             const docRef = doc(db, 'users', userId, 'devices', deviceId);
             const { id, ...updates } = device;
-            await updateDoc(docRef, updates);
-            return { data: { ...device }, error: null };
+            await updateDoc(docRef, { ...updates, updated_at: Date.now() });
+            return { data: { ...device, updated_at: Date.now() }, error: null };
         } catch (error: any) {
             return { data: null, error };
         }
     },
 
-    deleteDevice: async (userId: string, deviceId: string | number) => {
+    deleteDevice: async (userId: string, deviceId: string) => {
         try {
             await deleteDoc(doc(db, 'users', userId, 'devices', String(deviceId)));
             return { error: null };
