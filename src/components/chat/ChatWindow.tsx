@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import type { Message, SoftwareFilter, DownloadHistoryItem, Session, SavedDevice } from '../../types';
-import { findSoftware } from '../../services/aiService';
 import MessageItem from './MessageItem';
 import ChatInput from './ChatInput';
 import TypingIndicator from './TypingIndicator';
 import FilterControls from './FilterControls';
-import SuggestedPrompts from '../home/SuggestedPrompts';
 import { ChatWindowRef } from '../../App';
 import { dbService } from '../../services/dbService';
+import { useChatFlow } from '../../services/chatFlow/engine';
+import { findSoftware } from '../../services/aiService';
 
 interface ChatWindowProps {
     onDownload: (item: Omit<DownloadHistoryItem, 'id' | 'timestamp' | 'status'>) => void;
@@ -20,241 +20,241 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState<SoftwareFilter>('all');
-    const [inputPlaceholder, setInputPlaceholder] = useState('Ask for software...');
+    const [inputPlaceholder] = useState('Ask for software...');
 
+    // State Machine Hook
+    const flow = useChatFlow();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const initialMessage: Message = {
         id: 'init',
-        text: "Hello! I'm SoftMonk. I can help you find safe software, games, and drivers for Windows, macOS, Linux, and Android. What are you looking for today?",
+        text: "Hello! I'm SoftMonk. I can help you find safe software, games, and drivers. What are you looking for today?",
         sender: 'bot',
-        type: 'standard'
+        type: 'standard',
+        options: ['Driver', 'Software', 'Game'] // Init options matching S0->S1 flow approximately or generic
     };
 
-    // Load chat history from Supabase when session changes
+    // Load chat history or init state
     useEffect(() => {
         const fetchHistory = async () => {
             if (!session) {
-                setMessages([initialMessage]); // Show greeting to guests
+                // Initial State Machine Start
+                const { message, ui } = flow.transition(''); // S0 -> Next (S1) essentially
+                if (message) {
+                    setMessages([{ ...initialMessage, text: message, options: normalizeOptions(ui?.options) }]);
+                } else {
+                    setMessages([initialMessage]);
+                }
                 return;
             }
 
-            // This is a background task and should not trigger a user-facing loading indicator.
-            // The 'isLoading' state is reserved for when the bot is replying to user input.
             try {
                 const { data, error } = await dbService.getChatHistory(session.user.id);
-
-                if (error) {
-                    console.error("Error fetching chat history:", error);
-                    setMessages([initialMessage]);
+                if (error || !data || data.length === 0) {
+                    const { message, ui } = flow.transition('');
+                    if (message) {
+                        setMessages([{ ...initialMessage, text: message, options: normalizeOptions(ui?.options) }]);
+                    } else {
+                        setMessages([initialMessage]);
+                    }
                 } else {
-                    setMessages(data && data.length > 0 ? (data as Message[]) : [initialMessage]);
+                    setMessages(data as Message[]);
                 }
             } catch (e) {
-                console.error("A critical error occurred while fetching chat history:", e);
-                // In case of a critical failure, reset to a safe state.
+                console.error("Critical error loading history:", e);
                 setMessages([initialMessage]);
             }
         };
-
         fetchHistory();
-    }, [session]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session]); // Run once on session change
 
-
+    // Auto-scroll
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
-        // Logic to update placeholder based on conversation context
-        if (isLoading) {
-            setInputPlaceholder('SoftMonk is typing...');
-        } else {
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage?.sender === 'bot') {
-                if (['driver-input-prompt', 'driver-device-prompt', 'driver-device-selection', 'platform-prompt', 'software-clarification-prompt'].includes(lastMessage.type || '')) {
-                    const text = lastMessage.text.toLowerCase();
-                    if (text.includes('model') || text.includes('serial')) {
-                        setInputPlaceholder('Enter your PC model or serial number...');
-                    } else if (text.includes('manufacturer')) {
-                        setInputPlaceholder('Choose or type a manufacturer...');
-                    } else if (text.includes('operating system')) {
-                        setInputPlaceholder('Choose your OS from the options...');
-                    } else if (text.includes('component')) {
-                        setInputPlaceholder('Choose a component from the options...');
-                    } else {
-                        setInputPlaceholder('Please provide the requested information...');
-                    }
-                } else {
-                    setInputPlaceholder('Ask for software...');
-                }
-            } else {
-                // Reset placeholder if the last message is from the user or it's the start of the chat
-                setInputPlaceholder('Ask for software...');
-            }
-        }
     }, [messages, isLoading]);
 
-    const getBotResponse = async (history: Message[], currentFilter: SoftwareFilter, currentSession: Session | null) => {
-        setIsLoading(true);
-        try {
-            const botResponse = await findSoftware(history, currentFilter, currentSession);
-
-            const botMessage: Message = {
-                id: `bot-${Date.now()}`,
-                text: botResponse.text,
-                sender: 'bot',
-                groundingChunks: botResponse.groundingChunks,
-                type: botResponse.type,
-                platform: botResponse.platform,
-                suggestedDevice: botResponse.suggestedDevice,
-            };
-            setMessages(prev => [...prev, botMessage]);
-
-            // Save bot message to DB if user is logged in
-            if (session) {
-                // Remove suggestedDevice before saving to DB as it's a transient UI hint
-                // Remove suggestedDevice before saving to DB as it's a transient UI hint
-                await dbService.addChatMessage(session.user.id, {
-                    user_id: session.user.id,
-                    text: botMessage.text,
-                    sender: 'bot',
-                    grounding_chunks: botMessage.groundingChunks || null,
-                    type: botMessage.type || 'standard',
-                    platform: botMessage.platform || null,
-                });
-            }
-
-        } catch (error: any) {
-            console.error("Failed to get response:", error);
-            const errorMessage: Message = {
-                id: `err-${Date.now()}`,
-                text: error.message || "Sorry, something went wrong. Please try again.",
-                sender: 'bot',
-                type: 'standard',
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setIsLoading(false);
-        }
+    // Helper to normalize options from state config (string[] | func) to string[]
+    const normalizeOptions = (opts: any): string[] | undefined => {
+        if (!opts) return undefined;
+        if (typeof opts === 'function') return opts(flow.context);
+        return opts;
     };
 
-    const handleSendMessage = async (inputText: string) => {
+    // --- MAIN LOGIC: Observe State Machine for Side Effects (Like Searching S12) ---
+    useEffect(() => {
+        const performAsyncSearch = async () => {
+            if (flow.currentState === 'S12_SEARCH_AND_EXTRACT' && !isLoading) {
+                setIsLoading(true);
+
+                // synthesize query
+                const ctx = flow.context;
+                const deviceStr = ctx.deviceSelectedFromProfile
+                    ? 'my saved device'
+                    : `${ctx.device.manufacturer || ''} ${ctx.device.model || ''} ${ctx.device.osFamily || ''}`;
+
+                const query = `Find ${ctx.intent || 'software'}: ${ctx.request.driverType || ctx.request.queryName || ''} for ${deviceStr}.`;
+
+                // Use Injectable Context Pattern for accuracy
+                const systemContext = `[SYSTEM CONTEXT: The user wants ${ctx.intent}. Dev: ${ctx.device.manufacturer} ${ctx.device.model}, OS: ${ctx.device.osFamily}. Req: ${ctx.request.driverType || ctx.request.queryName}.]`;
+
+                // Add a temporary user message representing this synthesized intent (invisible or visible? Visible is better for history)
+                // Actually the user just clicked "Yes" to confirm summary. We don't need to add another user message.
+                // We will just call the AI service.
+
+                try {
+                    // We construct a specific history for the AI Service to force it to respect our context
+                    // We take the current visual history + our strong system context
+                    const searchHistory = [
+                        ...messages,
+                        {
+                            id: 'sys-context',
+                            text: systemContext + "\n" + query,
+                            sender: 'user',
+                            type: 'standard'
+                        } as Message
+                    ];
+
+                    const response = await findSoftware(searchHistory, filter, session);
+
+                    // Now we have the result. We need to manually advance the state machine to S15 or S12_NO_RESULTS
+                    // We can mock an input to the machine to force it, or exposes a set method. 
+                    // Current machine relies on 'transition'.
+                    // Looking at stateConfig: S12->S15 is unconditional in nextState.
+                    // So we just call transition once to move it.
+
+                    const { ui } = flow.transition('success'); // Input doesn't matter for S12->S15
+
+                    const botMessage: Message = {
+                        id: `bot-${Date.now()}`,
+                        text: response.text, // Use the AI's rich response instead of the generic S15 message if valid
+                        sender: 'bot',
+                        groundingChunks: response.groundingChunks,
+                        type: response.type,
+                        platform: response.platform,
+                        suggestedDevice: response.suggestedDevice,
+                        options: normalizeOptions(ui?.options) // S15 options (Save device, etc)
+                    };
+
+                    setMessages(prev => [...prev, botMessage]);
+
+                    if (session) {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { suggestedDevice, options, ...msgForDb } = botMessage;
+                        await dbService.addChatMessage(session.user.id, msgForDb);
+                    }
+
+                } catch (error) {
+                    console.error("Search failed", error);
+                    setMessages(prev => [...prev, {
+                        id: `err-${Date.now()}`,
+                        text: "I encountered an error searching for that. Please try again.",
+                        sender: 'bot'
+                    }]);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        performAsyncSearch();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flow.currentState]);
+
+
+    const handleUserTurn = async (inputText: string) => {
         if (!inputText.trim()) return;
 
-        if (!session) {
-            onLoginRequest();
-            return;
-        }
-
+        // 1. Add User Message to UI
         const userMessage: Message = {
             id: `user-${Date.now()}`,
             text: inputText,
             sender: 'user',
-            user_id: session.user.id
+            user_id: session?.user.id
         };
         const newHistory = [...messages, userMessage];
         setMessages(newHistory);
 
-        // Save user message to DB
-        await dbService.addChatMessage(session.user.id, {
-            user_id: session.user.id,
-            text: userMessage.text,
-            sender: 'user',
-            type: 'standard'
-        });
+        if (session) await dbService.addChatMessage(session.user.id, { ...userMessage, type: 'standard' });
 
-        await getBotResponse(newHistory, filter, session);
+        // 2. Transition State Machine
+        const { message, ui, state: nextState } = flow.transition(inputText);
+
+        // 3. Handle specific states that DON'T require async wait (everything except S12)
+        if (nextState !== 'S12_SEARCH_AND_EXTRACT' && message) {
+            // Simulate "Thinking" brief delay for better UX if not immediate
+            setIsLoading(true);
+            setTimeout(async () => {
+                const botMessage: Message = {
+                    id: `bot-${Date.now()}`,
+                    text: message,
+                    sender: 'bot',
+                    type: 'standard', // We could map state to types if needed
+                    options: normalizeOptions(ui?.options)
+                };
+                setMessages(prev => [...prev, botMessage]);
+                setIsLoading(false);
+
+                if (session) {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { options, ...msgForDb } = botMessage;
+                    await dbService.addChatMessage(session.user.id, msgForDb);
+                }
+            }, 600);
+        }
     };
 
-    // Expose the sendMessage function via the ref
+    // Public API
     useImperativeHandle(ref, () => ({
         sendMessage: (text: string) => {
-            if (!session) {
-                onLoginRequest();
-                return;
-            }
-            handleSendMessage(text);
+            if (!session) { onLoginRequest(); return; }
+            handleUserTurn(text);
         }
     }));
 
-    const handleOptionSelect = async (optionText: string) => {
-        if (!session) {
-            onLoginRequest();
-            return;
-        }
-
-        const userMessage: Message = {
-            id: `user-${Date.now()}`,
-            text: optionText,
-            sender: 'user',
-            user_id: session.user.id
-        };
-        const newHistory = [...messages, userMessage];
-        setMessages(newHistory);
-
-        await dbService.addChatMessage(session.user.id, {
-            user_id: session.user.id,
-            text: userMessage.text,
-            sender: 'user',
-            type: 'standard'
-        });
-
-        await getBotResponse(newHistory, filter, session);
-    };
-
-    const handleClearHistory = async () => {
-        if (!session) return; // Can't clear guest history
-
-        const confirmed = window.confirm(
-            "Are you sure you want to clear your entire chat history? This action cannot be undone."
-        );
-        if (confirmed) {
-            const { error } = await dbService.clearChatHistory(session.user.id);
-
-            if (error) {
-                console.error("Error clearing chat history:", error);
-                onShowToast("Could not clear your history. Please try again.");
-            } else {
-                setMessages([initialMessage]);
-            }
-        }
+    const handleOptionSelect = (optionText: string) => {
+        handleUserTurn(optionText);
     };
 
     const handleUserSaveDevice = async (device: Partial<SavedDevice>) => {
         if (!session) return;
-
-        // Ensure required fields exist
-        if (!device.name || !device.brand || !device.model) {
-            onShowToast("Could not save device: missing information.");
-            return;
-        }
-
-        const newDevice = {
-            name: `${device.brand} ${device.model}`, // Default name
-            type: 'other' as const, // Default type, user can edit later
-            brand: device.brand,
-            model: device.model,
-            os_family: device.os_family || 'Windows',
-            os_version: device.os_version || '',
-            serial_number: device.serial_number || '',
-            ...device // Spread to override defaults if present
+        // Use flow context if available to fill gaps
+        const fullDevice = {
+            ...device,
+            name: device.name || `${device.brand} ${device.model}`,
+            type: 'other' as const,
+            brand: device.brand || flow.context.device.manufacturer || 'Unknown',
+            model: device.model || flow.context.device.model || 'Unknown',
+            os_family: device.os_family || flow.context.device.osFamily || 'Windows',
+            os_version: device.os_version || flow.context.device.osVersion || '',
+            serial_number: device.serial_number || flow.context.device.serial || ''
         };
 
-        const { error } = await dbService.addDevice(session.user.id, newDevice as any); // Cast as any because AddDevice might expect strict types
-
+        const { error } = await dbService.addDevice(session.user.id, fullDevice as any);
         if (error) {
-            console.error("Error saving device:", error);
             onShowToast("Failed to save device. Please try again.");
         } else {
-            onShowToast(`Successfully saved ${newDevice.name}!`);
-            // Hide the prompt card optimistically
+            onShowToast(`Successfully saved ${fullDevice.name}!`);
             const currentMessages = [...messages];
             const lastMsg = currentMessages[currentMessages.length - 1];
             if (lastMsg && lastMsg.suggestedDevice) {
-                // We modify the message in state to remove the suggestion so it doesn't show again
                 const updatedLastMsg = { ...lastMsg, suggestedDevice: undefined };
                 currentMessages[currentMessages.length - 1] = updatedLastMsg;
                 setMessages(currentMessages);
             }
+            // Auto advance flow if we are in S16/S17
+            if (flow.currentState === 'S16_OFFER_SAVE_DEVICE') {
+                handleUserTurn('Save device');
+            }
+        }
+    };
+
+    const handleClearHistory = async () => {
+        if (!session) return;
+        if (window.confirm("Clear history?")) {
+            await dbService.clearChatHistory(session.user.id);
+            setMessages([initialMessage]);
+            flow.reset(); // Reset state machine
         }
     };
 
@@ -282,18 +282,16 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
                 ))}
 
                 {isLoading && <TypingIndicator />}
-
-                {!isLoading && messages.length <= 1 && (
-                    <SuggestedPrompts onPromptClick={handleSendMessage} />
-                )}
-
                 <div ref={messagesEndRef} />
             </div>
+
+            {/* Input is effectively driven by the State Machine's needs for S12 or standard input */}
             <ChatInput
-                onSendMessage={handleSendMessage}
+                onSendMessage={handleUserTurn}
                 isLoading={isLoading}
                 placeholder={inputPlaceholder}
             />
+            {/* Note: We rely on MessageItem to render the 'options' bubbles which are passed from the machine */}
         </div>
     );
 });
