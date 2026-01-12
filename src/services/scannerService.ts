@@ -11,7 +11,6 @@ export interface ScanResult {
 }
 
 const GOOGLE_SAFE_BROWSING_API_KEY = import.meta.env.VITE_GOOGLE_SAFE_BROWSING_KEY || '';
-const VIRUSTOTAL_API_KEY = import.meta.env.VITE_VIRUSTOTAL_KEY || '';
 
 /**
  * Simulates a multi-engine scan using Google Safe Browsing and basic heuristics.
