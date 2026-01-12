@@ -373,7 +373,23 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onOptionSelect, isLa
                     />
 
                     {/* Rendering Clickable Options (Chips) */}
-                    {(message.options && message.options.length > 0) ? (
+                    {/* Rendering Clickable Options (Chips) */}
+                    {(message.type === 'driver-device-prompt' && isLatestBotMessage) ? (
+                        <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600 flex flex-wrap gap-2">
+                            <button
+                                onClick={() => onOptionSelect('Yes, for a saved device')}
+                                className="px-4 py-2 bg-primary-gradient text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                            >
+                                Yes, use saved device
+                            </button>
+                            <button
+                                onClick={() => onOptionSelect('No, for something else')}
+                                className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                            >
+                                No, different device
+                            </button>
+                        </div>
+                    ) : (message.options && message.options.length > 0) ? (
                         <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600 flex flex-wrap gap-2">
                             {message.options.map((option) => (
                                 <button
