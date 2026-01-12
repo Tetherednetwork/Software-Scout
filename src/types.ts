@@ -53,15 +53,34 @@ export interface DownloadHistoryItem {
   user_id?: string;
 }
 
-export interface UserDevice {
-  id: string | number;
-  user_id: string;
-  device_name: string;
-  manufacturer: string;
+// Renaming UserDevice to SavedDevice effectively for clarity in new flow, or aliasing.
+// Let's stick to the requested SavedDevice structure for the chatbot flow.
+export interface SavedDevice {
+  id: string; // Changed to string for Firestore ID compatibility
+  name: string; // "My Work Laptop"
+  type: 'pc' | 'laptop' | 'phone' | 'tablet' | 'other';
+  brand: string;
   model: string;
+  os_family: string; // "Windows", "macOS"
+  os_version?: string; // "11 23H2"
   serial_number?: string;
-  os: string;
-  created_at?: string;
+  created_at: number; // specific timestamp format for this UI
+  updated_at: number;
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  notifications_enabled: boolean;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  preferences: UserPreferences;
+  downloadHistory: DownloadHistoryItem[];
+  savedDevices: SavedDevice[]; // The new critical field
 }
 
 export type SoftwareFilter = 'all' | 'free' | 'freemium' | 'paid';
