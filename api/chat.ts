@@ -210,25 +210,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const lastUserMessage = history[history.length - 1];
 
     try {
-        // Phase 1: Context Extraction
-        const context = await extractContext(history);
+        // Check for specific "[SYSTEM CONTEXT]" from the client-side pre-processor
+        // If present, we skip the hardcoded "Knowledge Graph" (Phase 1-3) and go straight to the intelligent LLM.
+        const hasSystemContext = lastUserMessage.text.includes('[SYSTEM CONTEXT:') || lastUserMessage.text.includes('[CONTEXT:');
 
-        // Phase 2: Candidate Matching
         let candidate = null;
-        if (context.software_name) {
-            const match = knowledgeBase.find(k =>
-                k.name.toLowerCase().includes(context.software_name.toLowerCase()) ||
-                k.keywords.some(kw => context.software_name.toLowerCase().includes(kw))
-            );
-            if (match) candidate = match;
-        }
+        let context: any = {};
 
-        if (!candidate) {
-            candidate = findSoftwareCandidate(lastUserMessage.text);
+        // Only try the hardcoded path if we don't have a specific context override
+        if (!hasSystemContext) {
+            // Phase 1: Context Extraction
+            context = await extractContext(history);
+
+            // Phase 2: Candidate Matching
+            if (context.software_name) {
+                const match = knowledgeBase.find(k =>
+                    k.name.toLowerCase().includes(context.software_name.toLowerCase()) ||
+                    k.keywords.some(kw => context.software_name.toLowerCase().includes(kw))
+                );
+                if (match) candidate = match;
+            }
+
+            if (!candidate) {
+                candidate = findSoftwareCandidate(lastUserMessage.text);
+            }
         }
 
         // Phase 3: Requirement Logic (Technician Mode)
-        if (candidate) {
+        if (candidate && !hasSystemContext) {
             const requirements = candidate.required_fields || [];
             let missingField = null;
 
@@ -248,7 +257,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
             if (missingField) {
-                // Ask the question!
+                // ... (Existing Logic for Missing Fields in Hardcoded Graph)
+                // Shortened for brevity as we are keeping the original logic structure but just wrapping it
+                // Re-implementing the switch/case from standard logic effectively
                 let question = "";
                 let options: string[] = [];
                 let type: any = 'question';
@@ -268,7 +279,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                         break;
                     case "laptop_model":
                         question = `Which specific ${candidate.manufacturer} model do you have?`;
-                        // Dynamic options hard for generic models, but could list series
                         options = ["Pavilion", "Envy", "Spectre", "Omen"];
                         break;
                     default:
@@ -283,7 +293,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 });
 
             } else {
-                // Phase 4: Delivery
+                // Phase 4: Delivery (Hardcoded Graph Success)
                 const solution = `I have verified the latest confirmed release: **${candidate.name}** for ${knownData.os_version || 'your system'}.\n\n*   **Verified Source:** ${candidate.manufacturer} Official\n*   **Security Check:** Passed`;
 
                 return res.status(200).json({
@@ -301,52 +311,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
 
         } else {
+            // --- NEW ROBUST FALLBACK (LLM Handles Slot Filling & Context) ---
 
-            // Check for "Top X" or "Trend" intent via simple keyword check first to save LLM tokens or specifically guide it
-            if (lastUserMessage.text.toLowerCase().includes('top') || lastUserMessage.text.toLowerCase().includes('best') || lastUserMessage.text.toLowerCase().includes('trend')) {
-                if (lastUserMessage.text.toLowerCase().includes('antivirus')) {
-                    const antivirusList = [
-                        { name: "Norton 360", description: "Comprehensive protection with VPN.", url: "https://us.norton.com/", logo: "https://logo.clearbit.com/norton.com" },
-                        { name: "Bitdefender", description: "Top-rated threat detection.", url: "https://www.bitdefender.com/", logo: "https://logo.clearbit.com/bitdefender.com" },
-                        { name: "McAfee Total Protection", description: "Identity monitoring & antivirus.", url: "https://www.mcafee.com/", logo: "https://logo.clearbit.com/mcafee.com" },
-                        { name: "Malwarebytes", description: "Specialized malware removal.", url: "https://www.malwarebytes.com/", logo: "https://logo.clearbit.com/malwarebytes.com" },
-                        { name: "ESET NOD32", description: "Fast & light-weight security.", url: "https://www.eset.com/", logo: "https://logo.clearbit.com/eset.com" }
-                    ];
-
-                    const listText = "Here are the top antivirus software trends for 2024 based on online security rankings:\n" +
-                        antivirusList.map(item => `[START_ITEM] **${item.name}** \n*Description*: ${item.description} \n*Official Source*: ${item.url}`).join("\n");
-
-                    return res.status(200).json({
-                        text: listText,
-                        type: 'software-list',
-                        groundingChunks: []
-                    });
-                }
-            }
-
-            // Fallback: Senior Technician Persona
             const messages = history.map((msg: any) => ({
                 role: (msg.sender === 'bot' ? 'assistant' : 'user') as 'assistant' | 'user' | 'system',
                 content: msg.text || ""
             }));
 
-            const systemPrompt = `You are SoftMonk's Senior PC Architect.
-            You help users find EXACT drivers, software, and runtimes.
-            If the user asks for "drivers", ask "For which component? (GPU, Chipset, Printer?)".
-            Keep answers precise and technical but accessible.
-            If user asks for "Top 5 [category]", list them if you know, but the system has a special handler for specific ones.
-            `;
+            // The SUPREME System Prompt
+            const systemPrompt = `You are SoftMonk, an AI cybersecurity expert and software guide.
+Your goal is to provide **safe, direct, verified** download links.
+
+**CRITICAL PROTOCOL: SYSTEM CONTEXT**
+If the user message contains a block like \`[SYSTEM CONTEXT: ...]\`, that is verified data from the user's saved device profile.
+- **TRUST IT.** Do not ask for the device name, brand, or OS if it is in the context.
+- Use that info to immediately find the specific driver or software requested.
+- PROCEED TO FIND THE LINK.
+
+**CRITICAL PROTOCOL: SLOT FILLING**
+If you DO NOT have context and the user asks for a "driver" or specific "software" where compatibility matters:
+1. **CHECK**: Do you know the Device Brand/Model? Do you know the OS?
+2. **ASK**: If missing, ask the user specifically for the missing piece. (e.g., "What is your laptop model?", "Are you on Windows 10 or 11?").
+3. **DO NOT GUESS.**
+
+**OUTPUT FORMAT RULES**
+- **Links**: When you have a specific download page, you MUST format it exactly like this:
+  \`[DOWNLOAD_LINK]https://example.com/drivers/page[/DOWNLOAD_LINK]\`
+  (This triggers the UI to show a "Verified Source" button).
+- **Warnings**: If a site is known for ads (like MajorGeeks), warn the user but provide the link if it's the safest option.
+- **Prohibited**: Never link to Softonic, CNET, or random blogs.
+
+**TONE**
+Professional, helpful, "Senior Technician".
+`;
             messages.unshift({ role: "system", content: systemPrompt });
 
             const completion = await openai.chat.completions.create({
                 messages: messages,
-                model: "gpt-3.5-turbo",
+                model: "gpt-3.5-turbo", // or gpt-4-turbo if available
+                temperature: 0.3, // Lower temperature for more deterministic slot filling
             });
 
+            // We return a standard response. The Client-Side `aiService.ts` will parse the `[DOWNLOAD_LINK]` tag
+            // and convert it into the `groundingChunks` array automatically.
             return res.status(200).json({
                 text: completion.choices[0].message.content,
-                type: 'standard',
-                groundingChunks: []
+                type: 'standard', // Client will upgrade this to 'software' or 'driver' based on content/tags
+                groundingChunks: [] // Client populates this from the tag
             });
         }
 
@@ -358,3 +369,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
     }
 }
+
+
