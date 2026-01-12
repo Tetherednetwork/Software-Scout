@@ -1,5 +1,5 @@
 
-import { GroundingChunk, Message, SoftwareFilter, Platform, Session, UserDevice } from '../types';
+import { GroundingChunk, Message, SoftwareFilter, Platform, Session, SavedDevice } from '../types';
 import { db } from './firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { findInVendorMap, detectPlatform } from './vendorMapService';
@@ -140,8 +140,8 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
                 const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
                 const snapshot = await getDocs(q);
                 if (!snapshot.empty) {
-                    const devices = snapshot.docs.map(d => d.data() as UserDevice);
-                    const deviceOptions = devices.map(d => `${d.device_name} (${d.manufacturer} ${d.model})`).join(', ');
+                    const devices = snapshot.docs.map(d => d.data() as SavedDevice);
+                    const deviceOptions = devices.map(d => `${d.name} (${d.brand} ${d.model})`).join(', ');
                     return { text: `Great! Which device is it for?\n[OPTIONS]: ${deviceOptions}`, type: 'driver-device-selection' };
                 }
             }
@@ -149,13 +149,13 @@ export const findSoftware = async (history: Message[], filter: SoftwareFilter, s
             if (lastBotMessage?.type === 'driver-device-selection') {
                 const q = query(collection(db, 'user_devices'), where('user_id', '==', session.user.id));
                 const snapshot = await getDocs(q);
-                const devices = snapshot.docs.map(d => d.data() as UserDevice);
-                const selectedDevice = devices?.find((d: UserDevice) => lastUserMessage.text.startsWith(d.device_name));
+                const devices = snapshot.docs.map(d => d.data() as SavedDevice);
+                const selectedDevice = devices?.find((d: SavedDevice) => lastUserMessage.text.startsWith(d.name));
 
                 if (selectedDevice) {
                     const originalRequestMessage = historyCopy.filter((m: Message) => m.sender === 'user').slice(-3, -2)[0];
                     if (originalRequestMessage) {
-                        const context = `[CONTEXT: The user has selected their device: a ${selectedDevice.manufacturer} ${selectedDevice.model} running ${selectedDevice.os}.]`;
+                        const context = `[CONTEXT: The user has selected their device: a ${selectedDevice.brand} ${selectedDevice.model} running ${selectedDevice.os_family}.]`;
                         lastUserMessage.text = `${context}\n\nBased on this context, please process my original request: "${originalRequestMessage.text}"`;
                     }
                 }

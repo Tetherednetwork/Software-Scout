@@ -3,39 +3,46 @@
     
     <url>
         <loc>https://softmonk.co/</loc>
-        <lastmod>2025-12-19</lastmod>
+        <lastmod>2026-01-12</lastmod>
         <priority>1.0</priority>
         <changefreq>daily</changefreq>
     </url>
     
     <url>
         <loc>https://softmonk.co/about</loc>
-        <lastmod>2025-12-19</lastmod>
+        <lastmod>2026-01-12</lastmod>
         <priority>0.8</priority>
         <changefreq>monthly</changefreq>
     </url>
     
     <url>
         <loc>https://softmonk.co/forum</loc>
-        <lastmod>2025-12-19</lastmod>
+        <lastmod>2026-01-12</lastmod>
         <priority>0.9</priority>
         <changefreq>weekly</changefreq>
     </url>
     
     <url>
         <loc>https://softmonk.co/blogs</loc>
-        <lastmod>2025-12-19</lastmod>
+        <lastmod>2026-01-12</lastmod>
         <priority>0.9</priority>
         <changefreq>weekly</changefreq>
     </url>
     
     <url>
         <loc>https://softmonk.co/file-verifier</loc>
-        <lastmod>2025-12-19</lastmod>
+        <lastmod>2026-01-12</lastmod>
         <priority>0.7</priority>
         <changefreq>monthly</changefreq>
     </url>
     
+    
+    <url>
+        <loc>https://softmonk.co/blog-post/EFaiAG3WPQo9ebbwzZIo</loc>
+        <lastmod>2026-01-11</lastmod>
+        <priority>0.8</priority>
+        <changefreq>yearly</changefreq>
+    </url>
     
     
 </urlset>

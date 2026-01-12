@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { DownloadHistoryItem, SafetyActionId, Session, UserDevice, Testimonial, FullUserProfile, Page } from './types';
+import type { DownloadHistoryItem, SafetyActionId, Session, SavedDevice, Testimonial, FullUserProfile, Page } from './types';
 import ChatWindow from './components/chat/ChatWindow';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -65,7 +65,7 @@ const AppContent: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<FullUserProfile | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [userDevices, setUserDevices] = useState<UserDevice[]>([]);
+  const [userDevices, setUserDevices] = useState<SavedDevice[]>([]);
   const [userTestimonial, setUserTestimonial] = useState<Testimonial | null>(null);
 
   const [currentPage, setCurrentPage] = useState<Page>(() => getPageAndIdFromPathname().page);
@@ -508,7 +508,7 @@ const AppContent: React.FC = () => {
     }, 100); // A small delay to ensure the chat window is rendered
   };
 
-  const handleDevicesUpdate = (newDevices: UserDevice[]) => {
+  const handleDevicesUpdate = (newDevices: SavedDevice[]) => {
     setUserDevices(newDevices);
   }
 

@@ -1,4 +1,4 @@
-import { db } from './firebase';
+// import { db } from './firebase'; // Removed unused import to fix TS6133
 import type { Message, SoftwareFilter, Session, GroundingChunk, Platform, SavedDevice } from '../types';
 import { findInVendorMap, detectPlatform } from './vendorMapService';
 import { dbService } from './dbService';

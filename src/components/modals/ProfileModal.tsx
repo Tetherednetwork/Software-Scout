@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../../services/authService';
 import { dbService } from '../../services/dbService';
-import type { Session, UserDevice, Testimonial, FullUserProfile } from '../../types';
+import type { Session, SavedDevice, Testimonial, FullUserProfile } from '../../types';
 import { CloseIcon, PlusIcon, LaptopIcon, PencilIcon, TrashIcon, SuccessIcon, LogoutIcon } from '../ui/Icons';
 import StarRating from '../ui/StarRating';
 import { upsertUserTestimonial, getUserTestimonial } from '../../services/testimonialService';
@@ -12,8 +12,8 @@ interface ProfileModalProps {
     session: Session | null;
     userProfile: FullUserProfile | null;
     onProfileUpdate: (profile: FullUserProfile) => void;
-    userDevices: UserDevice[];
-    onDevicesUpdate: (newDevices: UserDevice[]) => void;
+    userDevices: SavedDevice[];
+    onDevicesUpdate: (newDevices: SavedDevice[]) => void;
     userTestimonial: Testimonial | null;
     onTestimonialUpdate: (newTestimonial: Testimonial | null) => void;
 }
@@ -21,8 +21,8 @@ interface ProfileModalProps {
 const avatars = ['/images/monks_1.png', '/images/monks_2.png', '/images/monks_3.png', '/images/boy.png', '/images/girl.png', '/images/rabbit.png', '/images/dog.png', '/images/dinosaur.png'];
 
 // Default empty state for the device form
-const emptyDevice: Omit<UserDevice, 'id' | 'user_id' | 'created_at'> = {
-    device_name: '', manufacturer: '', model: '', serial_number: '', os: 'Windows 11'
+const emptyDevice: Omit<SavedDevice, 'id' | 'created_at' | 'updated_at'> = {
+    name: '', brand: '', model: '', serial_number: '', os_family: 'Windows', os_version: '11', type: 'laptop'
 };
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, session, userProfile, onProfileUpdate, userDevices, onDevicesUpdate, userTestimonial, onTestimonialUpdate }) => {
@@ -38,7 +38,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
 
     // State for device management
     const [isDeviceFormOpen, setIsDeviceFormOpen] = useState(false);
-    const [editingDevice, setEditingDevice] = useState<Partial<UserDevice> | null>(null);
+    const [editingDevice, setEditingDevice] = useState<Partial<SavedDevice> | null>(null);
     const [isSavingDevice, setIsSavingDevice] = useState(false);
 
     // Granular error and success states
@@ -136,31 +136,28 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
         }
     };
 
-    const handleDeviceSave = async (deviceData: Partial<UserDevice>) => {
+    const handleDeviceSave = async (deviceData: Partial<SavedDevice>) => {
         if (!session) return;
         setIsSavingDevice(true);
         setDeviceError('');
         setSuccessMessage('');
 
         try {
-            // Name uniqueness check is complex in Firestore without a separate index or reading all.
-            // Skipping strictly for this migration step to keep it simple, or we can fetch all and check locally.
+            // Name uniqueness locally check
             const { data: existingDevices } = await dbService.getUserDevices(session.user.id);
-            if (existingDevices && existingDevices.some(d => d.device_name === deviceData.device_name && d.id !== deviceData.id)) {
+            if (existingDevices && existingDevices.some((d: SavedDevice) => d.name === deviceData.name && d.id !== deviceData.id)) {
                 throw new Error('You already have a device with this name. Please choose a unique name.');
             }
 
             if (deviceData.id) {
-                const { data, error: updateError } = await dbService.updateDevice(session.user.id, { ...deviceData, id: deviceData.id });
+                const { data, error: updateError } = await dbService.updateDevice(session.user.id, { ...deviceData, id: deviceData.id } as any);
                 if (updateError) throw updateError;
-                // Since updateDevice implementation returns the updated object, we can use it.
-                // However, our local state `userDevices` might need casting since Firestore IDs are strings.
-                onDevicesUpdate(userDevices.map(d => d.id === data!.id ? data as UserDevice : d));
+                onDevicesUpdate(userDevices.map(d => d.id === data!.id ? data as SavedDevice : d));
                 setSuccessMessage('Device updated successfully!');
             } else {
                 const { data, error: insertError } = await dbService.addDevice(session.user.id, deviceData as any);
                 if (insertError) throw insertError;
-                onDevicesUpdate([...userDevices, data as UserDevice]);
+                onDevicesUpdate([...userDevices, data as SavedDevice]);
                 setSuccessMessage('Device added successfully!');
             }
             resetForm();
@@ -171,7 +168,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
         }
     };
 
-    const handleDeviceDelete = async (deviceId: string | number) => {
+    const handleDeviceDelete = async (deviceId: string) => {
         if (!session || !window.confirm("Are you sure you want to delete this device?")) return;
         setDeviceError('');
         setSuccessMessage('');
@@ -214,8 +211,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
     };
 
     const handleSessionRefresh = async () => {
-        // Firebase automatically handles token refreshing.
-        // We can force it if needed, but for now we'll just show success.
         setIsRefreshing(true);
         setTimeout(() => {
             setIsRefreshing(false);
@@ -319,8 +314,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
                                     <div className="flex items-center gap-3">
                                         <LaptopIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
                                         <div>
-                                            <p className="font-semibold text-gray-800 dark:text-white">{device.device_name}</p>
-                                            <p className="text-xs text-gray-500 dark:text-white">{device.manufacturer} {device.model} &bull; {device.os}</p>
+                                            <p className="font-semibold text-gray-800 dark:text-white">{device.name}</p>
+                                            <p className="text-xs text-gray-500 dark:text-white">{device.brand} {device.model} &bull; {device.os_family} {device.os_version}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -378,7 +373,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, ses
 };
 
 
-const DeviceForm: React.FC<{ device: Partial<UserDevice>, onSave: (device: Partial<UserDevice>) => void, onCancel: () => void, isLoading: boolean, formError: string }> = ({ device, onSave, onCancel, isLoading, formError }) => {
+const DeviceForm: React.FC<{ device: Partial<SavedDevice>, onSave: (device: Partial<SavedDevice>) => void, onCancel: () => void, isLoading: boolean, formError: string }> = ({ device, onSave, onCancel, isLoading, formError }) => {
     const [formData, setFormData] = useState(device);
 
     useEffect(() => {
@@ -399,13 +394,13 @@ const DeviceForm: React.FC<{ device: Partial<UserDevice>, onSave: (device: Parti
         <form onSubmit={handleSubmit} className="p-4 bg-gray-100 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 space-y-4">
             <h4 className="font-semibold text-md text-gray-800 dark:text-white">{device.id ? 'Edit Device' : 'Add New Device'}</h4>
             <div>
-                <label htmlFor="device_name" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Device Name</label>
-                <input type="text" name="device_name" value={formData.device_name || ''} onChange={handleChange} placeholder="e.g., My Gaming PC" required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
+                <label htmlFor="name" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Device Name</label>
+                <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="e.g., My Gaming PC" required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="manufacturer" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Manufacturer</label>
-                    <input type="text" name="manufacturer" value={formData.manufacturer || ''} onChange={handleChange} placeholder="e.g., Dell" required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
+                    <label htmlFor="brand" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Brand</label>
+                    <input type="text" name="brand" value={formData.brand || ''} onChange={handleChange} placeholder="e.g., Dell" required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
                 </div>
                 <div>
                     <label htmlFor="model" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Model</label>
@@ -418,22 +413,21 @@ const DeviceForm: React.FC<{ device: Partial<UserDevice>, onSave: (device: Parti
                     <input type="text" name="serial_number" value={formData.serial_number || ''} onChange={handleChange} className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
                 </div>
                 <div>
-                    <label htmlFor="os" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Operating System</label>
-                    <select name="os" value={formData.os || ''} onChange={handleChange} required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500">
-                        <option>Windows 11</option>
-                        <option>Windows 10 (64-bit)</option>
-                        <option>Windows 10 (32-bit)</option>
-                        <option>Windows 8.1</option>
-                        <option>Windows 7</option>
-                        <option>macOS Sonoma</option>
-                        <option>macOS Ventura</option>
-                        <option>macOS Monterey</option>
-                        <option>Linux (Debian-based)</option>
-                        <option>Linux (Arch-based)</option>
-                        <option>Linux (Fedora-based)</option>
-                        <option>Other</option>
+                    <label htmlFor="os_family" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">Operating System</label>
+                    <select name="os_family" value={formData.os_family || 'Windows'} onChange={handleChange} required className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500">
+                        <option value="Windows">Windows</option>
+                        <option value="macOS">macOS</option>
+                        <option value="Linux">Linux</option>
+                        <option value="Android">Android</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
+            </div>
+
+            {/* OS Version - Can be optional or text input */}
+            <div>
+                <label htmlFor="os_version" className="block text-xs font-medium text-gray-600 dark:text-white mb-1">OS Version (e.g. 11, 22H2, 14.0)</label>
+                <input type="text" name="os_version" value={formData.os_version || ''} onChange={handleChange} className="w-full bg-white dark:bg-gray-700 text-sm p-2 rounded-md focus:ring-green-500 focus:border-green-500" />
             </div>
 
             {formError && <p className="text-sm text-red-500 text-center mt-2">{formError}</p>}
