@@ -20,7 +20,7 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState<SoftwareFilter>('all');
-    const [inputPlaceholder] = useState('Ask for software...');
+    const [inputPlaceholder, setInputPlaceholder] = useState('Ask for software...');
 
     // State Machine Hook
     const flow = useChatFlow();
@@ -36,6 +36,35 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
 
     // Load chat history or init state
     useEffect(() => {
+        // Logic to update placeholder based on conversation context
+        if (isLoading) {
+            setInputPlaceholder('SoftMonk is typing...');
+        } else {
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage?.sender === 'bot') {
+                const text = lastMessage.text.toLowerCase();
+                // Check keywords to set a helpful placeholder
+                if (text.includes('model') || text.includes('serial') || text.includes('service tag')) {
+                    setInputPlaceholder('Enter your device model or serial...');
+                } else if (text.includes('manufacturer') || text.includes('brand')) {
+                    // Usually buttons, but fallback text input
+                    setInputPlaceholder('Type the manufacturer name...');
+                } else if (text.includes('operating system') || text.includes('os version') || text.includes('which version')) {
+                    setInputPlaceholder('e.g. Windows 11, macOS Sequoia...');
+                } else if (text.includes('driver') && text.includes('need')) {
+                    setInputPlaceholder('e.g. Wi-Fi, Audio, Graphics...');
+                } else if (text.includes('name do you want to call')) {
+                    setInputPlaceholder('e.g. My Work Laptop...');
+                } else if (text.includes('save this device')) {
+                    setInputPlaceholder('Type "Save device" or "Not now"...');
+                } else {
+                    setInputPlaceholder('Ask for software...');
+                }
+            } else {
+                // Reset placeholder if the last message is from the user or it's the start of the chat
+                setInputPlaceholder('Ask for software...');
+            }
+        };
         const fetchHistory = async () => {
             if (!session) {
                 // Initial State Machine Start
@@ -67,7 +96,7 @@ const ChatWindow = forwardRef<ChatWindowRef, ChatWindowProps>(({ onDownload, ses
         };
         fetchHistory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session]); // Run once on session change
+    }, [session, isLoading, messages]); // Run once on session change
 
     // Auto-scroll
     useEffect(() => {
